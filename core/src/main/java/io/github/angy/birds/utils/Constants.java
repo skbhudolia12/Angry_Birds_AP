@@ -2,8 +2,8 @@ package io.github.angy.birds.utils;
 
 public class Constants {
     // Screen
-    public static final float VIRTUAL_WIDTH = 800;
-    public static final float VIRTUAL_HEIGHT = 480;
+    public static final float VIRTUAL_WIDTH = 1920;
+    public static final float VIRTUAL_HEIGHT = 1080;
 
     // Physics
     public static final float PPM = 100; // Pixels per meter for Box2D
