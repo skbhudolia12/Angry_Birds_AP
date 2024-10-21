@@ -21,6 +21,8 @@ import io.github.angy.birds.AngryBirdsGame;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
+import javax.swing.event.ChangeEvent;
+
 public class MainMenu implements Screen {
     private final AngryBirdsGame game;
     private Stage stage;
@@ -106,12 +108,13 @@ public class MainMenu implements Screen {
             }
         });
 
-        playButton.addListener(new ChangeListener() {
+        playButton.addListener(new ClickListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                //game.setScreen(new GameScreen(game));
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new LevelSelectionScreen(game));
             }
         });
+
         stage.addActor(playButton);
         skin.add("play", playButton);
 

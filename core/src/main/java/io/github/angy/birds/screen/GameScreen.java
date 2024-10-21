@@ -14,7 +14,6 @@ public class GameScreen implements Screen {
     private Stage stage;
     private Skin skin;
 
-    // Game-related variables
     private boolean levelCompleted;
     private boolean gamePaused;        // Track if the game is paused
     private boolean pigsEliminated;    // Example condition to check for level completion
@@ -22,12 +21,10 @@ public class GameScreen implements Screen {
 
     public GameScreen(final AngryBirdsGame game) {
         this.game = game;
-        stage = new Stage(new FitViewport(800, 480));
+        stage = new Stage(new FitViewport(AngryBirdsGame.VIRTUAL_WIDTH, AngryBirdsGame.VIRTUAL_HEIGHT));
         Gdx.input.setInputProcessor(stage);
 
         skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
-
-        // Initialize game state
         levelCompleted = false;
         gamePaused = false;         // Initialize gamePaused to false
         pigsEliminated = false;     // Assume false at the start of the game
