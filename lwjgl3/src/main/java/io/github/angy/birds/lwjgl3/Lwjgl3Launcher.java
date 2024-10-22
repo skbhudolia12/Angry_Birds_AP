@@ -19,7 +19,7 @@ public class Lwjgl3Launcher {
 
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
-        configuration.setTitle("Angy Bibz");
+        configuration.setTitle("Angry Birds");
 
         // Vsync settings
         configuration.useVsync(true);
