@@ -59,7 +59,7 @@ public class LevelSelectionScreen implements Screen {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                game.setScreen(new GameScreen(game));
+                game.setScreen(new GameLevelOneScreen(game));
                 return true;
             }
         });
@@ -82,7 +82,7 @@ public class LevelSelectionScreen implements Screen {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                game.setScreen(new GameScreen(game));
+                game.setScreen(new GameLevelOneScreen(game));
                 return true;
             }
         });
