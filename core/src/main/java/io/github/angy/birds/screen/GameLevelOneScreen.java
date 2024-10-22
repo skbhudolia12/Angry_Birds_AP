@@ -44,7 +44,7 @@ public class GameLevelOneScreen implements Screen {
 
     private void loadAssets() {
         skin = new Skin();
-        tiledMap = new TmxMapLoader().load("ui/level1.tmx");
+        tiledMap = new TmxMapLoader().load("ui/Angry Birds2.0/level1.tmx");
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
     }
 

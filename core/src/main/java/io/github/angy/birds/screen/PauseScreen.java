@@ -3,10 +3,15 @@ package io.github.angy.birds.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import io.github.angy.birds.AngryBirdsGame;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -16,46 +21,49 @@ public class PauseScreen implements Screen {
     private final AngryBirdsGame game;
     private Stage stage;
     private Skin skin;
-    private TextButton resumeButton, mainMenuButton;
+    private Image resumeButton;
+    private Image returnHomeButton;
+    private Image backgroundImage;
 
     public PauseScreen(final AngryBirdsGame game) {
         this.game = game;
-        stage = new Stage(new FitViewport(800, 480));
+        stage = new Stage(new FitViewport(1920, 1080));
         Gdx.input.setInputProcessor(stage);
 
         skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
+        backgroundImage = new Image(new Texture(Gdx.files.internal("textures/backgrounds/pausemenu.jpg")));
+        backgroundImage.setFillParent(true);
+        backgroundImage.setZIndex(0);
+        stage.addActor(backgroundImage);
 
-        // Create buttons for pause screen
         createButtons();
     }
 
     private void createButtons() {
-        // Resume button
-        resumeButton = new TextButton("Resume", skin);
-        resumeButton.addListener(new ChangeListener() {
+        resumeButton = new Image(new Texture(Gdx.files.internal("textures/backgrounds/TestRectangle.png")));
+        returnHomeButton= new Image(new Texture(Gdx.files.internal("textures/backgrounds/TransparentRectangle.png")));
+        resumeButton.setSize(110, 110);
+        returnHomeButton.setSize(110, 110);
+        resumeButton.setPosition(240, 490);
+        returnHomeButton.setPosition(160, 340);
+        resumeButton.setZIndex(1);
+        returnHomeButton.setZIndex(1);
+        stage.addActor(resumeButton);
+        stage.addActor(returnHomeButton);
+
+        resumeButton.addListener(new ClickListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                game.setScreen(new GameScreen(game)); // Go back to GameScreen
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new GameLevelOneScreen(game));
             }
         });
 
-        // Main menu button
-        mainMenuButton = new TextButton("Main Menu", skin);
-        mainMenuButton.addListener(new ChangeListener() {
+        returnHomeButton.addListener(new ClickListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                game.setScreen(new MainMenu(game)); // Go back to MainMenu
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new MainMenu(game));
             }
         });
-
-        // Use a Table layout for positioning
-        Table table = new Table();
-        table.center();
-        table.setFillParent(true);
-        table.add(resumeButton).padBottom(10).row();
-        table.add(mainMenuButton).padTop(10);
-
-        stage.addActor(table);
     }
 
     @Override

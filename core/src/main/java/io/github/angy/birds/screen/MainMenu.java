@@ -111,7 +111,7 @@ public class MainMenu implements Screen {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new LevelSelectionScreen(game));
+                game.setScreen(new PauseScreen(game));
             }
         });
 
@@ -149,6 +149,9 @@ public class MainMenu implements Screen {
         stage.addActor(exitButton);
         skin.add("exit", exitButton);
 
+        if(Gdx.input.isKeyPressed(Input.Keys.P)){
+            game.setScreen(new PauseScreen(game));
+        }
     }
 
     @Override
