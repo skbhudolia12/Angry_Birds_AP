@@ -30,6 +30,7 @@ public class MainMenu implements Screen {
     private Image backgroundImageMain;
     private Image TitleScreenLogo;
     private Image playButton;
+    private Image muteButton;
     private Image exitButton;
     private Image pillarImage;
     private Image pillarImage1;
@@ -114,9 +115,48 @@ public class MainMenu implements Screen {
                 game.setScreen(new LevelSelectionScreen(game));
             }
         });
-
         stage.addActor(playButton);
         skin.add("play", playButton);
+
+        muteButton = new Image(new Texture(Gdx.files.internal("ui/mute_bird.png")));
+        muteButton.setSize(120, 120);
+        muteButton.setPosition((stage.getWidth()-pillarImage.getWidth())/2+185, stage.getHeight()/2-90);
+        muteButton.setZIndex(2);
+        muteButton.addListener(new InputListener(){
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                ScaleToAction enlargeAction = new ScaleToAction();
+                enlargeAction.setScale(1.1f);
+                enlargeAction.setDuration(0.2f);
+                muteButton.addAction(enlargeAction);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                ScaleToAction shrinkAction = new ScaleToAction();
+                shrinkAction.setScale(1.0f);
+                shrinkAction.setDuration(0.2f);
+                muteButton.addAction(shrinkAction);
+            }
+        });
+
+        final boolean[] flag = {true};
+        muteButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if(flag[0]){
+                    //game.getMusic().pause();
+                    muteButton.setDrawable(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("ui/unmute_bird.png")))));
+                    flag[0] = false;
+                } else {
+                    //game.getMusic().play();
+                    muteButton.setDrawable(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("ui/mute_bird.png")))));
+                    flag[0] = true;
+                }
+            }
+        });
+
+        stage.addActor(muteButton);
+        skin.add("mute", muteButton);
 
         exitButton = new Image(new Texture(Gdx.files.internal("ui/exitButton_bird.png")));
         exitButton.setSize(120, 120);
