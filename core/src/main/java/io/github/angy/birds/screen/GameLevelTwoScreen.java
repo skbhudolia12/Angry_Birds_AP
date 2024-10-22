@@ -24,7 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import io.github.angy.birds.AngryBirdsGame;
 
-public class GameLevelOneScreen implements Screen {
+public class GameLevelTwoScreen implements Screen {
     private final AngryBirdsGame game;
     private Stage stage;
     private Skin skin;
@@ -34,7 +34,7 @@ public class GameLevelOneScreen implements Screen {
     private OrthogonalTiledMapRenderer tiledMapRenderer;
     private Box2DDebugRenderer debugRenderer;
 
-    public GameLevelOneScreen(final AngryBirdsGame game) {
+    public GameLevelTwoScreen(final AngryBirdsGame game) {
         this.game = game;
         stage = new Stage(new FitViewport(1920, 1080));
         Gdx.input.setInputProcessor(stage);
@@ -58,7 +58,7 @@ public class GameLevelOneScreen implements Screen {
     private void loadAssets() {
         skin = new Skin();
         //Load background
-        Texture backgroundTexture = new Texture(Gdx.files.internal("ui/level1.png"));
+        Texture backgroundTexture = new Texture(Gdx.files.internal("ui/level2.png"));
         backgroundImage = new Image(new TextureRegionDrawable(backgroundTexture));
         backgroundImage.setFillParent(true);
         stage.addActor(backgroundImage);
