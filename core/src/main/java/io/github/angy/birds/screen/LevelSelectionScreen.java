@@ -22,6 +22,7 @@ public class LevelSelectionScreen implements Screen {
     private Image backgroundImage;
     private Image level1Button;
     private Image level2Button;
+    private Image ReturnButton;
 
     public LevelSelectionScreen(final AngryBirdsGame game) {
         this.game = game;
@@ -88,6 +89,29 @@ public class LevelSelectionScreen implements Screen {
         });
         stage.addActor(level2Button);
         skin.add("level2", level2Button);
+
+        ReturnButton = new Image(new Texture(Gdx.files.internal("ui/returnButton.png")));
+        ReturnButton.setSize(80, 100);
+        ReturnButton.setPosition(0, 0);
+        ReturnButton.setZIndex(1);
+        stage.addActor(ReturnButton);
+        ReturnButton.addListener(new InputListener() {
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                ReturnButton.addAction(Actions.scaleTo(1.1f, 1.1f, 0.2f));
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                ReturnButton.addAction(Actions.scaleTo(1.0f, 1.0f, 0.2f));
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                game.setScreen(new MainMenu(game));
+                return true;
+            }
+        });
     }
 
     @Override
