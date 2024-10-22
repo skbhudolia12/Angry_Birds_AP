@@ -46,10 +46,10 @@ public class GameScreen implements Screen {
             togglePause();
         }
 
-        // If the game is paused, render the pause screen
+
         if (gamePaused) {
-            game.setScreen(new PauseScreen(game));  // Switch to the pause screen, passing the current game state
-            return;  // Don't render the rest of the game while paused
+            game.setScreen(new PauseScreen(game));
+            return;
         }
 
         // Game logic to check if the level is complete (this is a placeholder logic)
@@ -67,7 +67,6 @@ public class GameScreen implements Screen {
 
     // Example method to check if the level is completed
     private void checkLevelCompletion() {
-        // You can have conditions like all pigs are eliminated or all birds are used
         if (pigsEliminated || birdsExhausted) {
             levelCompleted = true;  // Trigger level completion
         }
