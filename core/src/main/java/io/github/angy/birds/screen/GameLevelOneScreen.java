@@ -1,5 +1,7 @@
 package io.github.angy.birds.screen;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import io.github.angy.birds.entities.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -58,12 +60,31 @@ public class GameLevelOneScreen implements Screen {
     private void loadAssets() {
         skin = new Skin();
         //Load background
-        Texture backgroundTexture = new Texture(Gdx.files.internal("ui/level1.png"));
+        Texture backgroundTexture = new Texture(Gdx.files.internal("ui/Angry Birds2.0/level1.png"));
         backgroundImage = new Image(new TextureRegionDrawable(backgroundTexture));
         backgroundImage.setFillParent(true);
         stage.addActor(backgroundImage);
         skin.add("background", backgroundTexture);
-        backgroundImage.setZIndex(0);
+
+        //Load the Birds
+        RedBird redBird = new RedBird(100, 380);
+        YellowBird yellowBird = new YellowBird(160, 380);
+        //BlueBird blueBird = new BlueBird(100, 380);
+        //BlackBird blackBird = new BlackBird(100, 380);
+
+        //Load the Slingshot
+        Slingshot slingshot = new Slingshot(200, 380);
+
+        //Load the Pigs
+        GreenPig pig = new GreenPig(900, 380);
+
+       stage.addActor(redBird);
+       stage.addActor(yellowBird);
+       stage.addActor(slingshot);
+       stage.addActor(pig);
+       //stage.addActor(blueBird);
+       //stage.addActor(blackBird);
+       backgroundImage.setZIndex(0);
     }
 
     //Using later for TMX files.

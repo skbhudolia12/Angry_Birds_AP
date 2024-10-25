@@ -3,8 +3,9 @@ package io.github.angy.birds.entities;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 
-public abstract class Pig {
+public abstract class Pig extends Actor {
     protected Texture texture;
     protected Vector2 position;
 
