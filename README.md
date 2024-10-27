@@ -1,33 +1,20 @@
-# Angy Bibz
+#Angry Birds Game (AP_Project_2024)
+Github repository owners - Sarthak Bhudolia (2023491) & Sakshat Sachdeva (2023474)
 
-A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
+This is our README File in accordance to Deadline 2 of our AP Project.
+- We have created our project on LibGDX.
+- To run the program, you must run the program using gradle in IntelliJ
+- On running, a loading screen will open up which will then take you to the Main Menu Screen of our game
+- Here, you can either choose to enter the game, mute/unmute the game or exit the game.
+- Upon exit, the code will be terminated and you will be out.
+- If you choose to enter the game, you will see the level selection menu.
+- Here we, have created level 1 with all the elements in it, however, level 2 is just a framework/background for the level.
+- You can navigate from the Level Selection screen to Main Menu with the back button located bottom left.
+- On entering Level 1, you can either choose to Pause the game using 'P' command on your keyboard.
+- In the Pause menu, you can navigate to restart the level, resume the level or quit back to the level selection screen.
+- While in Level 1, pressing the 'N' command on your keyboard, you will open the Level Completion Screen.
+- Here, you can either go to the next level i.e lvl 2, replay the level or quit back to main menu.
 
-This project was generated with a template including simple application launchers and an `ApplicationAdapter` extension that draws libGDX logo.
+This is a complete go through for our project submission.
 
-## Platforms
-
-- `core`: Main module with the application logic shared by all platforms.
-- `lwjgl3`: Primary desktop platform using LWJGL3; was called 'desktop' in older docs.
-
-## Gradle
-
-This project uses [Gradle](https://gradle.org/) to manage dependencies.
-The Gradle wrapper was included, so you can run Gradle tasks using `gradlew.bat` or `./gradlew` commands.
-Useful Gradle tasks and flags:
-
-- `--continue`: when using this flag, errors will not stop the tasks from running.
-- `--daemon`: thanks to this flag, Gradle daemon will be used to run chosen tasks.
-- `--offline`: when using this flag, cached dependency archives will be used.
-- `--refresh-dependencies`: this flag forces validation of all dependencies. Useful for snapshot versions.
-- `build`: builds sources and archives of every project.
-- `cleanEclipse`: removes Eclipse project data.
-- `cleanIdea`: removes IntelliJ project data.
-- `clean`: removes `build` folders, which store compiled classes and built archives.
-- `eclipse`: generates Eclipse project data.
-- `idea`: generates IntelliJ project data.
-- `lwjgl3:jar`: builds application's runnable jar, which can be found at `lwjgl3/build/libs`.
-- `lwjgl3:run`: starts the application.
-- `test`: runs unit tests (if any).
-
-Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
-For example, `core:clean` removes `build` folder only from the `core` project.
+Thank you.
