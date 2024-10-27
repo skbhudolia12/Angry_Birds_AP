@@ -55,6 +55,17 @@ public class GameLevelOneScreen implements Screen {
                 return false;
             }
         });
+
+        stage.addListener(new InputListener() {
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                if (keycode == Input.Keys.N) {
+                    game.setScreen(new WinScreen(game, new GameLevelTwoScreen(game)));
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     private void loadAssets() {
