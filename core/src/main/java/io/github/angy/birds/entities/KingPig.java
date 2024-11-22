@@ -1,9 +1,11 @@
 package io.github.angy.birds.entities;
 
+import com.badlogic.gdx.physics.box2d.World;
+
 public class KingPig extends Pig {
 
-    public KingPig(float x, float y) {
-        super("ui/pigs/kingpig.png", x, y);  // Assuming you have this texture in your assets
+    public KingPig(float x, float y, World world) {
+        super("ui/pigs/kingpig.png", x, y,world);  // Assuming you have this texture in your assets
     }
 
     @Override

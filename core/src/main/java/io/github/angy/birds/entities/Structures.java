@@ -3,8 +3,9 @@ package io.github.angy.birds.entities;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 
-public abstract class Structures {
+public abstract class Structures extends Actor {
     protected float x, y;
     protected Texture texture;
     protected int durability;

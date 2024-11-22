@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public class YellowBird extends AngryBird {
@@ -13,8 +14,8 @@ public class YellowBird extends AngryBird {
     private Texture texture;
     private SpriteBatch batch;
 
-    public YellowBird(float x, float y) {
-        super("ui/angry birds/yellowbird.png", x, y);
+    public YellowBird(float x, float y, World world) {
+        super("ui/angry birds/yellowbird.png", x, y,world);
         this.x = x;
         this.y = y;
         this.texture = new Texture("ui/angry birds/yellowbird.png");

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.physics.box2d.World;
 
 public class GreenPig extends Pig {
 
@@ -13,8 +14,8 @@ public class GreenPig extends Pig {
     private Texture texture;
     private SpriteBatch batch;
 
-    public GreenPig(float x, float y) {
-        super("ui/pigs/helmetpig.png", x, y);  // Assuming you have this texture in your assets
+    public GreenPig(float x, float y, World world) {
+        super("ui/pigs/helmetpig.png", x, y,world);  // Assuming you have this texture in your assets
         this.x = x;
         this.y = y;
         setPosition(x, y);
