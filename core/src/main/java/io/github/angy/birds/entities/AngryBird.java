@@ -15,6 +15,10 @@ public abstract class AngryBird extends Actor {
     protected Body body;
     private World world;
 
+    public boolean isFlying = false;
+    public boolean isReady = false;
+    public boolean isDead = false;
+
     public AngryBird(String texturePath, float x, float y, World world) {
         this.texture = new Texture(texturePath);
         this.position = new Vector2(x, y);
@@ -24,25 +28,42 @@ public abstract class AngryBird extends Actor {
         createPhysicsBody();
     }
 
+    public void freezeBird() {
+        body.setLinearVelocity(0, 0);  // Freeze the bird's motion
+        body.setAngularVelocity(0);    // Prevent any rotation
+        body.setGravityScale(0);       // Disable gravity
+        body.getFixtureList().first().setSensor(true);
+    }
+
     private void createPhysicsBody() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(position.x, position.y);
+        bodyDef.position.set(position.x + 10, position.y+10);
 
         body = world.createBody(bodyDef);
 
         CircleShape shape = new CircleShape();
-        shape.setRadius(15f);
+        shape.setRadius(40f);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 1.0f;
-        fixtureDef.restitution = 0.4f;
-        fixtureDef.friction = 0.5f;
+        fixtureDef.density = 8f;
+        fixtureDef.restitution = 0.7f;
+        fixtureDef.friction = 0.6f;
+        fixtureDef.isSensor = false;
 
-        assert body != null;
+        body.setAngularDamping(2.0f);
+
         body.createFixture(fixtureDef);
         shape.dispose();
+        freezeBird();
+    }
+
+    public void unfreezeBird() {
+        // Allow the bird to be affected by gravity again
+        body.setGravityScale(1);  // Enable gravity
+        isReady = true;
+        body.getFixtureList().first().setSensor(false);
     }
 
     @Override
@@ -53,7 +74,12 @@ public abstract class AngryBird extends Actor {
         }
     }
 
-    public abstract void update(float delta);
+    public void update(float delta){
+        if(body!=null){
+            position.set(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
+            image.setPosition(position.x, position.y);
+        }
+    }
 
     public void render(SpriteBatch batch) {
         batch.draw(image, position.x, position.y);

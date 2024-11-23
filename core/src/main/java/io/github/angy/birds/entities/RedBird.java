@@ -35,8 +35,6 @@ public class RedBird extends AngryBird {
         }
     }
 
-
-
     @Override
     public void draw(Batch batch, float parentAlpha) {
         batch.draw(image, x, y, 75, 75);
