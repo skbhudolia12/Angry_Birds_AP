@@ -34,6 +34,7 @@ public class GameLevelOneScreen implements Screen {
     private Texture backgroundTexture;
 
     private boolean isDragging = false;
+    private boolean isLaunched = false;
     private Vector2 slingStart, slingEnd;
     private ShapeRenderer shapeRenderer;
     private List<Vector2> trajectoryPoints;
@@ -79,11 +80,11 @@ public class GameLevelOneScreen implements Screen {
         Body groundBody = world.createBody(groundBodyDef);
 
         PolygonShape groundShape = new PolygonShape();
-        groundShape.setAsBox(8, 0.5f); // Width 16, Height 1
+        groundShape.setAsBox(8, 1.25f); // Width 16, Height 1
 
         FixtureDef groundFixture = new FixtureDef();
         groundFixture.shape = groundShape;
-        groundFixture.friction = 0.8f;
+        groundFixture.friction = 50f;
 
         groundBody.createFixture(groundFixture);
         groundShape.dispose();
@@ -114,11 +115,6 @@ public class GameLevelOneScreen implements Screen {
 
         debugRenderer.render(world, camera.combined);
         shapeRenderer.setProjectionMatrix(camera.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Color.RED);
-        Rectangle bounds = curBird.getBoundingRectangle();
-        shapeRenderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
-        shapeRenderer.end();
     }
 
     public void sensorBody(World world, Body body, AngryBird bird) {
@@ -145,6 +141,7 @@ public class GameLevelOneScreen implements Screen {
         public boolean touchDown(int screenX, int screenY, int pointer, int button) {
             Vector3 touchPoint = new Vector3(screenX, screenY, 0);
             camera.unproject(touchPoint);
+            if(isLaunched) return false;
             if (curBird.getBoundingRectangle().contains(touchPoint.x, touchPoint.y)) {
                 isDragging = true;
                 slingStart.set(touchPoint.x, touchPoint.y);
@@ -179,10 +176,11 @@ public class GameLevelOneScreen implements Screen {
         @Override
         public boolean touchUp(int screenX, int screenY, int pointer, int button) {
             if (isDragging) {
-                Vector2 impulse = new Vector2(slingStart).sub(slingEnd).scl(5); // Adjust force multiplier
+                Vector2 impulse = new Vector2(slingStart).sub(slingEnd).scl(10); // Adjust force multiplier
                 curBird.getBody().applyLinearImpulse(impulse, curBird.getBody().getWorldCenter(), true);
                 curBird.unfreezeBird();
                 isDragging = false;
+                isLaunched = true;
                 return true;
             }
             return false;
@@ -203,10 +201,10 @@ public class GameLevelOneScreen implements Screen {
         Vector2 tempVelocity = new Vector2(initialVelocity);
 
         // Time step for simulation
-        float timeStep = 1 / 60f;
+        float timeStep = 1 / 120f;
 
         // Simulate trajectory points
-        for (int i = 0; i < 100; i++) { // Adjust the number of points as needed
+        for (int i = 0; i < 120; i++) { // Adjust the number of points as needed
             // Update velocity due to gravity
             tempVelocity.y += world.getGravity().y * timeStep;
 
@@ -229,7 +227,7 @@ public class GameLevelOneScreen implements Screen {
 
         // Draw each point as a small circle
         for (Vector2 point : trajectoryPoints) {
-            shapeRenderer.circle(point.x, point.y, 0.25f); // Adjust radius for better visibility
+            shapeRenderer.circle(point.x, point.y, 0.125f); // Adjust radius for better visibility
         }
 
         shapeRenderer.end();

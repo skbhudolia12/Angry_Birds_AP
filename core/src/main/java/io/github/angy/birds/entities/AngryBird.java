@@ -89,8 +89,8 @@ public class AngryBird extends Actor {
         fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = density;
-        fixtureDef.friction = 0.6f;
-        fixtureDef.restitution = 0.7f;
+        fixtureDef.friction = 10f;
+        fixtureDef.restitution = 0.0f;
         fixtureDef.isSensor = false;
 
         body.setAngularDamping(2.0f);
