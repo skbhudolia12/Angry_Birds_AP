@@ -1,7 +1,6 @@
 package io.github.angy.birds.screen;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -10,7 +9,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
@@ -38,7 +36,8 @@ public class GameLevelOneScreen implements Screen {
     private Vector2 slingStart, slingEnd;
     private ShapeRenderer shapeRenderer;
     private List<Vector2> trajectoryPoints;
-
+    int i = 0;
+    private String[] birdForLevel = {"red", "yellow"};
     public GameLevelOneScreen() {
 
         // Setup camera and viewport
@@ -72,6 +71,23 @@ public class GameLevelOneScreen implements Screen {
         curBird = new AngryBird( 2, 2, world, "red");
     }
 
+    private void createBorder(float x, float y, float width, float height) {
+        BodyDef borderBodyDef = new BodyDef();
+        borderBodyDef.position.set(x, y);
+
+        Body borderBody = world.createBody(borderBodyDef);
+
+        PolygonShape borderShape = new PolygonShape();
+        borderShape.setAsBox(width / 2, height / 2);
+
+        FixtureDef borderFixture = new FixtureDef();
+        borderFixture.shape = borderShape;
+        borderFixture.restitution = 1.0f; // Make the border bouncy
+
+        borderBody.createFixture(borderFixture);
+        borderShape.dispose();
+    }
+
     private void createGround() {
         // Ground is a static body
         BodyDef groundBodyDef = new BodyDef();
@@ -88,18 +104,29 @@ public class GameLevelOneScreen implements Screen {
 
         groundBody.createFixture(groundFixture);
         groundShape.dispose();
+        createBorder(0,4.5f,0.1f,9);
+        createBorder(16,4.5f,0.1f,9);
     }
 
     @Override
     public void render(float delta) {
-        sensorBody(world,curBird.getBody(),curBird);
-        world.step(1 / 120f, 6, 2);
 
         // Clear screen
         Gdx.gl.glClearColor(0.5f, 0.7f, 1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // Update camera
+        if(birdForLevel.length > i){
+            curBird = new AngryBird( 2, 2, world, birdForLevel[i]);
+            i++;
+            if(i<birdForLevel.length){
+                curBird = new AngryBird( 2, 2, world, birdForLevel[i]);
+                curBird.relocate(2f, 2f);
+            }
+        }
+        if(curBird != null){
+            sensorBody(world,curBird.getBody(),curBird);
+        }
+        world.step(1 / 120f, 6, 2);
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 

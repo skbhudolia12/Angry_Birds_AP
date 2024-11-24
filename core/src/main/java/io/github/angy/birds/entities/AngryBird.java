@@ -153,7 +153,7 @@ public class AngryBird extends Actor {
         }
 
         if (isDead) {
-            //texture = new Texture("skin/birdDissapear.png");
+            texture = new Texture("textures/backgrounds/TransparentRectangle.png");
         }
 
         region = new TextureRegion(texture);
