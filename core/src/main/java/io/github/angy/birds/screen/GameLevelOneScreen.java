@@ -169,7 +169,7 @@ public class GameLevelOneScreen implements Screen {
                 }
 
                 // Update bird position while dragging
-                curBird.setPosition(slingEnd.x, slingEnd.y);
+                curBird.getBody().setTransform(slingEnd.x, slingEnd.y, curBird.getBody().getAngle());
                 calculateTrajectory();
                 return true;
             }
@@ -190,32 +190,51 @@ public class GameLevelOneScreen implements Screen {
     }
 
     private void calculateTrajectory() {
-        trajectoryPoints.clear();
+        trajectoryPoints.clear(); // Clear old points
 
-        // Simulate trajectory
-        Vector2 initialVelocity = new Vector2(slingStart).sub(slingEnd).scl(5);
-        Vector2 tempPosition = new Vector2(curBird.getBody().getPosition());
+        // Start position is slingStart because that's where the pull starts
+        Vector2 startPosition = new Vector2(slingStart.x, slingStart.y);
+
+        // Calculate the initial velocity based on the pull force
+        Vector2 initialVelocity = new Vector2(slingStart).sub(slingEnd).scl(10); // Adjust scaling factor as needed
+
+        // Copy the start position and velocity to simulate the trajectory
+        Vector2 tempPosition = new Vector2(startPosition);
         Vector2 tempVelocity = new Vector2(initialVelocity);
 
+        // Time step for simulation
         float timeStep = 1 / 60f;
-        for (int i = 0; i < 60; i++) { // Adjust points for longer/shorter trajectory
+
+        // Simulate trajectory points
+        for (int i = 0; i < 100; i++) { // Adjust the number of points as needed
+            // Update velocity due to gravity
             tempVelocity.y += world.getGravity().y * timeStep;
+
+            // Update position based on velocity
             tempPosition.mulAdd(tempVelocity, timeStep);
+
+            // Store the calculated point
             trajectoryPoints.add(new Vector2(tempPosition));
+
+            // Stop if the point is below the ground (y < 0)
+            if (tempPosition.y < 0) break;
         }
     }
+
 
     private void drawTrajectory() {
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.RED);
 
+        // Draw each point as a small circle
         for (Vector2 point : trajectoryPoints) {
-            shapeRenderer.circle(point.x, point.y, 0.05f); // Small circles for trajectory
+            shapeRenderer.circle(point.x, point.y, 0.25f); // Adjust radius for better visibility
         }
 
         shapeRenderer.end();
     }
+
 
     @Override
     public void resize(int width, int height) {
