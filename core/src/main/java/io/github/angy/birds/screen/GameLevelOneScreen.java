@@ -15,6 +15,8 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.angy.birds.entities.AngryBird;
+import io.github.angy.birds.entities.Pig;
+import io.github.angy.birds.entities.Structures;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,10 +38,15 @@ public class GameLevelOneScreen implements Screen {
     private Vector2 slingStart, slingEnd;
     private ShapeRenderer shapeRenderer;
     private List<Vector2> trajectoryPoints;
-    int i = 0;
-    private String[] birdForLevel = {"red", "yellow"};
-    public GameLevelOneScreen() {
 
+    private String[] birdForLevel = {"red", "yellow"};
+    private int birdIndex = 0;
+
+    // Add a list to store pigs
+    private List<Pig> pigs;
+    private List<Structures> structures;
+
+    public GameLevelOneScreen() {
         // Setup camera and viewport
         camera = new OrthographicCamera();
         viewport = new FitViewport(16, 9, camera); // Aspect ratio: 16:9
@@ -56,37 +63,43 @@ public class GameLevelOneScreen implements Screen {
 
         slingStart = new Vector2(20, 20); // Adjust for your slingshot placement
         slingEnd = new Vector2(slingStart); // Sling end starts at slingStart
+
         // Create entities
         createBirds();
         createGround();
+        createPigs();
+        createStructures();
 
-        // Sling start position (near slingshot)
-
-        // Trajectory rendering setup
         shapeRenderer = new ShapeRenderer();
         trajectoryPoints = new ArrayList<>();
     }
 
     private void createBirds() {
-        curBird = new AngryBird( 2, 2, world, "red");
+        if (birdForLevel.length > birdIndex) {
+            curBird = new AngryBird(2, 2, world, birdForLevel[birdIndex]);
+        }
     }
 
-    private void createBorder(float x, float y, float width, float height) {
-        BodyDef borderBodyDef = new BodyDef();
-        borderBodyDef.position.set(x, y);
+    private void createPigs() {
+        pigs = new ArrayList<>();
 
-        Body borderBody = world.createBody(borderBodyDef);
-
-        PolygonShape borderShape = new PolygonShape();
-        borderShape.setAsBox(width / 2, height / 2);
-
-        FixtureDef borderFixture = new FixtureDef();
-        borderFixture.shape = borderShape;
-        borderFixture.restitution = 1.0f; // Make the border bouncy
-
-        borderBody.createFixture(borderFixture);
-        borderShape.dispose();
+        // Add pigs with positions and types
+        pigs.add(new Pig(10, 2, world, "small"));
+        pigs.add(new Pig(12, 2.5f, world, "small"));
+        pigs.add(new Pig(14, 3, world, "small"));
     }
+
+    private void createStructures() {
+        structures = new ArrayList<>();
+
+        // Add two woodblock1
+        structures.add(new Structures(10, 1.5f, 1f, 0.5f, world, "woodblock1", 20));
+        structures.add(new Structures(12, 2.0f, 1f, 0.5f, world, "woodblock1", 20));
+
+        // Add one woodblock2
+        structures.add(new Structures(14, 2.5f, 2f, 0.5f, world, "woodblock2", 30));
+    }
+
 
     private void createGround() {
         // Ground is a static body
@@ -104,62 +117,44 @@ public class GameLevelOneScreen implements Screen {
 
         groundBody.createFixture(groundFixture);
         groundShape.dispose();
-        createBorder(0,4.5f,0.1f,9);
-        createBorder(16,4.5f,0.1f,9);
     }
 
     @Override
     public void render(float delta) {
-
         // Clear screen
         Gdx.gl.glClearColor(0.5f, 0.7f, 1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        if(birdForLevel.length > i){
-            curBird = new AngryBird( 2, 2, world, birdForLevel[i]);
-            i++;
-            if(i<birdForLevel.length){
-                curBird = new AngryBird( 2, 2, world, birdForLevel[i]);
-                curBird.relocate(2f, 2f);
-            }
-        }
-        if(curBird != null){
-            sensorBody(world,curBird.getBody(),curBird);
-        }
         world.step(1 / 120f, 6, 2);
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
+        // Draw background, slingshot, and bird
         batch.begin();
         batch.draw(backgroundTexture, 0, 0, 16, 9); // Full screen background
         batch.draw(slingshotTexture, 1.8f, 1.3f, 0.5f, 1); // Slingshot at fixed position
-        curBird.draw(batch); // Draw red bird
+        curBird.draw(batch); // Draw bird
+
+        // Draw pigs
+        for (Pig pig : pigs) {
+            if (!pig.isDead) {
+                pig.draw(batch);
+            }
+        }
+
+        for(Structures structure : structures) {
+            if(!structure.isDestroyed()) {
+                structure.draw(batch);
+            }
+        }
         batch.end();
 
-        if(isDragging){
+        if (isDragging) {
             drawTrajectory();
         }
 
         debugRenderer.render(world, camera.combined);
-        shapeRenderer.setProjectionMatrix(camera.combined);
     }
-
-    public void sensorBody(World world, Body body, AngryBird bird) {
-    float minVelocity = 0.1f; // Define a minimum velocity threshold
-
-    // Check if the bird's body velocity is below the minimum threshold
-    if (body.getLinearVelocity().len() < minVelocity) {
-        // Set the bird's body as a sensor to avoid further collisions
-        for (Fixture fixture : body.getFixtureList()) {
-            fixture.setSensor(true);
-        }
-    } else {
-        // Ensure the bird's body is not a sensor if it's moving above the threshold
-        for (Fixture fixture : body.getFixtureList()) {
-            fixture.setSensor(false);
-        }
-    }
-}
 
     private class GameInputAdapter extends InputAdapter {
         private static final float MAX_PULL_DISTANCE = 1f; // Set maximum pull distance in world units
@@ -246,20 +241,20 @@ public class GameLevelOneScreen implements Screen {
         }
     }
 
-
     private void drawTrajectory() {
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.RED);
+        shapeRenderer.setColor(Color.BLACK);
 
-        // Draw each point as a small circle
-        for (Vector2 point : trajectoryPoints) {
-            shapeRenderer.circle(point.x, point.y, 0.125f); // Adjust radius for better visibility
+        int spacing = 5; // Adjust spacing to skip points (higher value = greater spacing)
+
+        for (int i = 0; i < trajectoryPoints.size(); i += spacing) {
+            Vector2 point = trajectoryPoints.get(i);
+            shapeRenderer.circle(point.x, point.y, 0.05f, 20); // Adjust radius for visibility
         }
 
         shapeRenderer.end();
     }
-
 
     @Override
     public void resize(int width, int height) {
@@ -291,5 +286,14 @@ public class GameLevelOneScreen implements Screen {
         backgroundTexture.dispose();
         curBird.dispose();
         shapeRenderer.dispose();
+
+        // Dispose pigs
+        for (Pig pig : pigs) {
+            pig.dispose();
+        }
+
+        for(Structures structure : structures) {
+            structure.dispose();
+        }
     }
 }

@@ -1,38 +1,167 @@
-// Structure.java
 package io.github.angy.birds.entities;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.World;
 
-public abstract class Structures extends Actor {
-    protected float x, y;
-    protected Texture texture;
-    protected int durability;
+public class Structures {
+    private Body body;
+    private Texture texture;
+    private TextureRegion region;
+    private float width, height;
+    private int durability;
+    private boolean isDestroyed = false;
 
-    public Structures(float x, float y, String texturePath, int durability) {
-        this.x = x;
-        this.y = y;
-        this.texture = new Texture(texturePath);
+    public Structures(float x, float y, float width, float height, World world, String texturePath, int durability) {
+        this.width = width;
+        this.height = height;
         this.durability = durability;
+        identify(texturePath);
+        this.region = new TextureRegion(texture);
+        createBody(x, y, world);
     }
 
-    public void render(SpriteBatch batch) {
-        batch.draw(texture, x, y);
+    private void identify(String type) {
+        switch (type) {
+            case "woodblock1":
+                texture = new Texture("ui/Angry Birds2.0/woodblock1.png");
+                width = 1f;
+                height = 0.5f;
+                durability = 20;
+                break;
+
+            case "woodblock2":
+                texture = new Texture("ui/Angry Birds2.0/woodblock2.png");
+                width = 2f;
+                height = 0.5f;
+                durability = 30;
+                break;
+
+            case "woodcone1":
+                texture = new Texture("ui/Angry Birds2.0/woodcone1.png");
+                width = 0.5f;
+                height = 1f;
+                durability = 25;
+                break;
+
+            case "glassblock1":
+                texture = new Texture("ui/Angry Birds2.0/glassblock1.png");
+                width = 1f;
+                height = 0.5f;
+                durability = 15;
+                break;
+
+            case "glassblock2":
+                texture = new Texture("ui/Angry Birds2.0/glassblock2.png");
+                width = 2f;
+                height = 0.5f;
+                durability = 20;
+                break;
+
+            case "glasscone1":
+                texture = new Texture("ui/Angry Birds2.0/glasscone1.png");
+                width = 0.5f;
+                height = 1f;
+                durability = 18;
+                break;
+
+            case "metalblock1":
+                texture = new Texture("ui/Angry Birds2.0/metalblock1.png");
+                width = 1f;
+                height = 0.5f;
+                durability = 50;
+                break;
+
+            case "metalblock2":
+                texture = new Texture("ui/Angry Birds2.0/metalblock2.png");
+                width = 2f;
+                height = 0.5f;
+                durability = 60;
+                break;
+
+            case "metalcone1":
+                texture = new Texture("ui/Angry Birds2.0/metalcone1.png");
+                width = 0.5f;
+                height = 1f;
+                durability = 55;
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unknown structure type: " + type);
+        }
+
+        region = new TextureRegion(texture); // Set the region for rendering
     }
 
-    public int getDurability() {
-        return durability;
+
+    private void createBody(float x, float y, World world) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.StaticBody; // Structures are static
+        bodyDef.position.set(x, y);
+
+        body = world.createBody(bodyDef);
+
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(width / 2, height / 2);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.density = 1.5f; // Adjust density for sturdiness
+        fixtureDef.friction = 0.8f; // Adjust friction for collision interactions
+        fixtureDef.restitution = 0.2f; // Slight bounce
+
+        body.createFixture(fixtureDef);
+        shape.dispose();
+    }
+
+    public void draw(SpriteBatch batch) {
+        if (isDestroyed) return;
+
+        Vector2 position = body.getPosition();
+        float angle = body.getAngle();
+
+        batch.draw(
+            region,
+            position.x - width / 2, position.y - height / 2,
+            width / 2, height / 2, // Origin for rotation
+            width, height,
+            1f, 1f, // Scaling factors
+            angle * MathUtils.radiansToDegrees
+        );
     }
 
     public void takeDamage(int damage) {
+        if (isDestroyed) return;
+
         durability -= damage;
         if (durability <= 0) {
-            dispose();
+            isDestroyed = true;
         }
     }
 
+    public boolean isDestroyed() {
+        return isDestroyed;
+    }
+
+    public Rectangle getBoundingRectangle() {
+        return new Rectangle(
+            body.getPosition().x - width / 2,
+            body.getPosition().y - height / 2,
+            width,
+            height
+        );
+    }
+
     public void dispose() {
+        body.getWorld().destroyBody(body);
         texture.dispose();
     }
 }
