@@ -2,95 +2,232 @@ package io.github.angy.birds.entities;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.physics.box2d.*;
 
-public abstract class AngryBird extends Actor {
-    private Texture texture;
-    private Sprite image;
-    protected Vector2 position;
+public class AngryBird extends Actor {
     protected Body body;
-    private World world;
+    private int life;
+    private int maxLife;
+    private Texture texture;
+    private TextureRegion region;
+    private float density;
+    private float radius;
+    private float maxPower;
+    private String type;
+
+    private FixtureDef fixtureDef;
 
     public boolean isFlying = false;
     public boolean isReady = false;
     public boolean isDead = false;
 
-    public AngryBird(String texturePath, float x, float y, World world) {
-        this.texture = new Texture(texturePath);
-        this.position = new Vector2(x, y);
-        this.image = new Sprite(texture);
-        this.world = world;
+    private static final float MAXRED = 10f;
+    private static final float MAXBIG = 40f;
+    private static final float MAXYELLOW = 15f;
 
-        createPhysicsBody();
+    private static final float REDDENS = 8f;
+    private static final float BIGDENS = 8f;
+    private static final float YELLOWDENS = 8f;
+
+    private static final float REDRADIUS = 0.2f;
+    private static final float BIGRADIUS = 0.4f;
+    private static final float YELLOWRADIUS = 0.2f;
+
+    private static final int REDLIFE = 15;
+    private static final int BIGLIFE = 17;
+    private static final int YELLOWLIFE = 15;
+
+    public AngryBird(float x, float y, World world, String type) {
+        this.type = type;
+        identify(type);
+        createBody(x, y, world);
+        freezeBird();
     }
 
-    public void freezeBird() {
-        body.setLinearVelocity(0, 0);  // Freeze the bird's motion
-        body.setAngularVelocity(0);    // Prevent any rotation
-        body.setGravityScale(0);       // Disable gravity
-        body.getFixtureList().first().setSensor(true);
+    private void identify(String type) {
+        switch (type) {
+            case "red":
+                texture = new Texture("ui/angry birds/redbird.png");
+                region = new TextureRegion(texture);
+                life = REDLIFE;
+                maxLife = REDLIFE;
+                density = REDDENS;
+                radius = REDRADIUS;
+                maxPower = MAXRED;
+                break;
+            case "yellow":
+                texture = new Texture("ui/angry birds/yellowbird.png");
+                region = new TextureRegion(texture);
+                life = YELLOWLIFE;
+                maxLife = YELLOWLIFE;
+                density = YELLOWDENS;
+                radius = YELLOWRADIUS;
+                maxPower = MAXYELLOW;
+                break;
+        }
     }
 
-    private void createPhysicsBody() {
+    private void createBody(float x, float y, World world) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(position.x + 10, position.y+10);
+        bodyDef.position.set(x, y);
 
         body = world.createBody(bodyDef);
 
         CircleShape shape = new CircleShape();
-        shape.setRadius(40f);
+        shape.setRadius(radius);
 
-        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 8f;
-        fixtureDef.restitution = 0.7f;
+        fixtureDef.density = density;
         fixtureDef.friction = 0.6f;
+        fixtureDef.restitution = 0.7f;
         fixtureDef.isSensor = false;
 
         body.setAngularDamping(2.0f);
-
         body.createFixture(fixtureDef);
-        shape.dispose();
-        freezeBird();
+    }
+
+    public void freezeBird() {
+        body.setLinearVelocity(0, 0);
+        body.setAngularVelocity(0);
+        body.setGravityScale(0);
+        body.getFixtureList().first().setSensor(true);
     }
 
     public void unfreezeBird() {
-        // Allow the bird to be affected by gravity again
-        body.setGravityScale(1);  // Enable gravity
+        body.setGravityScale(1);
         isReady = true;
         body.getFixtureList().first().setSensor(false);
     }
 
-    @Override
-    public void setPosition(float x, float y) {
-        position.set(x, y);
-        if (body != null) {
-            body.setTransform(x, y, body.getAngle());
+    public void draw(SpriteBatch batch) {
+        Vector2 position = body.getPosition();
+        float angle = body.getAngle();
+        float originX = radius;
+        float originY = radius;
+
+        updateTexture();
+
+        batch.draw(region,
+                position.x - originX, position.y - originY,
+                originX, originY,
+                2 * radius, 2 * radius,
+                1f, 1f,
+                angle * MathUtils.radiansToDegrees
+        );
+
+        if (life <= 0) {
+            isDead = true;
+            isReady = false;
+            body.getFixtureList().first().setSensor(true);
         }
     }
 
-    public void update(float delta){
-        if(body!=null){
-            position.set(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
-            image.setPosition(position.x, position.y);
+    private void updateTexture() {
+        if (life <= maxLife / 2) {
+            if (texture != null) {
+                texture.dispose();
+            }
+
+            switch (type) {
+                case "red":
+                    //texture = new Texture("skin/dead-red.png");
+                    break;
+                case "big":
+                    //texture = new Texture("skin/dead-big.png");
+                    break;
+                case "yellow":
+                    //texture = new Texture("skin/dead-yellow.png");
+                    break;
+            }
         }
+
+        if (isDead) {
+            //texture = new Texture("skin/birdDissapear.png");
+        }
+
+        region = new TextureRegion(texture);
     }
 
-    public void render(SpriteBatch batch) {
-        batch.draw(image, position.x, position.y);
+    public int getLife() {
+        return life;
+    }
+
+    public void setLife(int life) {
+        this.life = life;
+    }
+
+    public int calculateDamage(float distance, float relativeSpeed) {
+        float damage = relativeSpeed / (distance + 1);
+        return (int) damage;
     }
 
     public void dispose() {
+        body.getWorld().destroyBody(body);
         texture.dispose();
-        world.destroyBody(body);
     }
 
-    public Body getBody() {
+    public void onHit(int damage) {
+        if (isDead) {
+            return;
+        }
+        life -= damage;
+    }
+
+    public void relocate(float newX, float newY) {
+        body.setTransform(newX, newY, body.getAngle());
+        isDead = false;
+        isReady = false;
+        isFlying = false;
+        freezeBird();
+    }
+
+    public boolean isMoving() {
+        if (!isDead) {
+            return body.getLinearVelocity().len() > 0.1f;
+        }
+        return false;
+    }
+
+    @Override
+    public void setPosition(float x, float y) {
+        body.setTransform(x, y, body.getAngle());
+    }
+
+    public void update(float delta) {
+        if (body != null) {
+            Vector2 position = body.getPosition();
+            setPosition(position.x - getWidth() / 2, position.y - getHeight() / 2);
+        }
+    }
+
+    public Body getBody(){
         return body;
+    }
+
+    public TextureRegion getTextura(){
+        return region;
+    }
+
+    public float getRadius () {
+        return radius;
+    }
+
+    public Rectangle getBoundingRectangle() {
+        float x = body.getPosition().x - radius;
+        float y = body.getPosition().y - radius;
+        float width = 10 * radius;
+        float height = 10 * radius;
+        return new Rectangle(x, y, width, height);
     }
 }

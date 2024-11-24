@@ -2,238 +2,250 @@ package io.github.angy.birds.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import io.github.angy.birds.entities.AngryBird;
 
-import io.github.angy.birds.AngryBirdsGame;
-import io.github.angy.birds.entities.RedBird;
-import io.github.angy.birds.entities.Slingshot;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameLevelOneScreen implements Screen {
-    private final AngryBirdsGame game;
-    private Stage stage;
-    private Skin skin;
-    private ShapeRenderer shapeRenderer;
-    private Box2DDebugRenderer debugRenderer;
+    SpriteBatch batch = new SpriteBatch();
     private OrthographicCamera camera;
+    private Viewport viewport;
 
-    private RedBird redBird;
-    private Slingshot slingshot;
-    private World world; // Box2D world to manage physics
+    private World world;
+    private Box2DDebugRenderer debugRenderer;
+
+    private AngryBird curBird;
+    private Texture slingshotTexture;
+    private Texture backgroundTexture;
 
     private boolean isDragging = false;
-    private Vector2 dragStartPosition = new Vector2();
-    private Vector2 dragEndPosition = new Vector2();
+    private Vector2 slingStart, slingEnd;
+    private ShapeRenderer shapeRenderer;
+    private List<Vector2> trajectoryPoints;
 
-    public GameLevelOneScreen(final AngryBirdsGame game) {
-        this.game = game;
-        shapeRenderer = new ShapeRenderer();
-        stage = new Stage(new FitViewport(1920, 1080));
-        Gdx.input.setInputProcessor(stage);
+    public GameLevelOneScreen() {
 
+        // Setup camera and viewport
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 1920, 1080);
+        viewport = new FitViewport(16, 9, camera); // Aspect ratio: 16:9
+        camera.position.set(8, 4.5f, 0); // Center camera
+        camera.update();
 
+        // Box2D setup
+        world = new World(new Vector2(0, -9.8f), true); // Gravity
         debugRenderer = new Box2DDebugRenderer();
 
-        // Initialize the Box2D world
-        world = new World(new Vector2(0, -9.8f), true);// Gravity = -9.8 (downward)
+        // Load textures
+        slingshotTexture = new Texture("ui/slingshot.png");
+        backgroundTexture = new Texture("ui/Angry Birds2.0/level1.png");
+
+        slingStart = new Vector2(20, 20); // Adjust for your slingshot placement
+        slingEnd = new Vector2(slingStart); // Sling end starts at slingStart
+        // Create entities
+        createBirds();
         createGround();
-        loadAssets();
+
+        // Sling start position (near slingshot)
+
+        // Trajectory rendering setup
+        shapeRenderer = new ShapeRenderer();
+        trajectoryPoints = new ArrayList<>();
+    }
+
+    private void createBirds() {
+        curBird = new AngryBird( 2, 2, world, "red");
     }
 
     private void createGround() {
-        // Define the ground body
+        // Ground is a static body
         BodyDef groundBodyDef = new BodyDef();
-        groundBodyDef.position.set(960, 150); // Centered horizontally at y = 150
+        groundBodyDef.position.set(8, 0);
 
-        // Create the body in the world
         Body groundBody = world.createBody(groundBodyDef);
 
-        // Define the shape of the ground (a box)
         PolygonShape groundShape = new PolygonShape();
-        groundShape.setAsBox(960, 10); // Width of 1920 (full screen), height of 10
+        groundShape.setAsBox(8, 0.5f); // Width 16, Height 1
 
-        // Define the fixture and attach it to the ground body
-        FixtureDef groundFixtureDef = new FixtureDef();
-        groundFixtureDef.shape = groundShape;
-        groundFixtureDef.density = 0f; // Static body doesn't need density
-        groundFixtureDef.friction = 0.5f; // Adjust for desired slipperiness
+        FixtureDef groundFixture = new FixtureDef();
+        groundFixture.shape = groundShape;
+        groundFixture.friction = 0.8f;
 
-        groundBody.createFixture(groundFixtureDef);
-
-        // Dispose of the shape when done
+        groundBody.createFixture(groundFixture);
         groundShape.dispose();
-    }
-
-
-    private void loadAssets() {
-        skin = new Skin();
-
-        // Load the background
-        Texture backgroundTexture = new Texture(Gdx.files.internal("ui/Angry Birds2.0/level1.png"));
-        Image backgroundImage = new Image(new TextureRegionDrawable(backgroundTexture));
-        backgroundImage.setFillParent(true);
-        stage.addActor(backgroundImage);
-        skin.add("background", backgroundTexture);
-
-        // Load the RedBird and pass the Box2D world to it
-        redBird = new RedBird(125, 300, world); // Pass the world to the RedBird
-
-        // Load the Slingshot
-        slingshot = new Slingshot(125, 150);
-
-        // Add actors to the stage
-        stage.addActor(redBird);
-        stage.addActor(slingshot);
-        backgroundImage.setZIndex(0);
-    }
-
-    @Override
-    public void show() {
-        Gdx.input.setInputProcessor(stage);
-        stage.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                // Convert touch position from screen space to stage space
-                Vector2 touchPos = new Vector2(x, y);
-                stage.screenToStageCoordinates(touchPos);
-
-                // Check if the slingshot or bird is touched
-                if (slingshot != null && slingshot.getBoundingRectangle().contains(touchPos.x, touchPos.y)) {
-                    // Start dragging the slingshot
-                    isDragging = true;
-                    dragStartPosition.set(touchPos);
-                    return true; // Consume the event (we're handling it)
-                } else if (redBird != null && redBird.getBoundingRectangle().contains(touchPos.x, touchPos.y)) {
-                    // Start dragging the bird
-                    isDragging = true;
-                    dragStartPosition.set(touchPos);
-                    return true; // Consume the event (we're handling it)
-                }
-                return false; // Pass the event to other listeners if we aren't handling it
-            }
-
-            @Override
-            public void touchDragged(InputEvent event, float x, float y, int pointer) {
-                if (isDragging) {
-                    dragEndPosition.set(x, y); // Update drag end position
-
-                    // Update the position of the bird if it's being dragged
-                    if (redBird != null) {
-                        redBird.setPosition(dragEndPosition.x, dragEndPosition.y);
-                    }
-                }
-            }
-
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                if (isDragging) {
-                    // Calculate the launch vector from the start and end drag positions
-                    Vector2 launchVector = dragStartPosition.sub(dragEndPosition).scl(3); // Scale the vector for desired strength
-                    slingshot.launchBird(launchVector); // Launch the bird
-
-                    // Apply velocity to the bird's physics body
-                    if (redBird != null) {
-                        redBird.getBody().setLinearVelocity(launchVector);
-                    }
-
-                    // Set dragging to false
-                    isDragging = false;
-                }
-            }
-        });
     }
 
     @Override
     public void render(float delta) {
-        // Clear the screen
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+        sensorBody(world,curBird.getBody(),curBird);
+        world.step(1 / 120f, 6, 2);
+
+        // Clear screen
+        Gdx.gl.glClearColor(0.5f, 0.7f, 1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // Render the trajectory if dragging
-        if (isDragging) {
-            renderTrajectory();
+        // Update camera
+        camera.update();
+        batch.setProjectionMatrix(camera.combined);
+
+        batch.begin();
+        batch.draw(backgroundTexture, 0, 0, 16, 9); // Full screen background
+        batch.draw(slingshotTexture, 1.8f, 1.3f, 0.5f, 1); // Slingshot at fixed position
+        curBird.draw(batch); // Draw red bird
+        batch.end();
+
+        if(isDragging){
+            drawTrajectory();
         }
 
-        // Step the physics simulation
-        world.step(delta, 6, 2);
-
-        // Render the stage
-        stage.act(delta);
-        stage.draw();
-
-        // Render debug renderer
         debugRenderer.render(world, camera.combined);
+        shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.RED);
+        Rectangle bounds = curBird.getBoundingRectangle();
+        shapeRenderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
+        shapeRenderer.end();
     }
 
-    private void renderTrajectory() {
-        // The bird's initial position is the drag start position
-        Vector2 birdPosition = dragStartPosition;
+    public void sensorBody(World world, Body body, AngryBird bird) {
+    float minVelocity = 0.1f; // Define a minimum velocity threshold
 
-        // Launch velocity derived from the drag vector
-        Vector2 launchVelocity = dragStartPosition.sub(dragEndPosition).scl(3); // Scaling factor for launch strength
+    // Check if the bird's body velocity is below the minimum threshold
+    if (body.getLinearVelocity().len() < minVelocity) {
+        // Set the bird's body as a sensor to avoid further collisions
+        for (Fixture fixture : body.getFixtureList()) {
+            fixture.setSensor(true);
+        }
+    } else {
+        // Ensure the bird's body is not a sensor if it's moving above the threshold
+        for (Fixture fixture : body.getFixtureList()) {
+            fixture.setSensor(false);
+        }
+    }
+}
 
-        // Constants for physics simulation
-        float timeStep = 0.1f; // Time step for trajectory points
-        float gravity = -9.8f; // Gravity force (negative because it's downward)
-        int maxSteps = 50; // Number of points to render in the trajectory
+    private class GameInputAdapter extends InputAdapter {
+        private static final float MAX_PULL_DISTANCE = 1f; // Set maximum pull distance in world units
 
-        // Start drawing the trajectory points
+        @Override
+        public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+            Vector3 touchPoint = new Vector3(screenX, screenY, 0);
+            camera.unproject(touchPoint);
+            if (curBird.getBoundingRectangle().contains(touchPoint.x, touchPoint.y)) {
+                isDragging = true;
+                slingStart.set(touchPoint.x, touchPoint.y);
+                slingEnd.set(touchPoint.x, touchPoint.y);
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public boolean touchDragged(int screenX, int screenY, int pointer) {
+            if (isDragging) {
+                Vector3 touchPoint = new Vector3(screenX, screenY, 0);
+                camera.unproject(touchPoint);
+                slingEnd.set(touchPoint.x, touchPoint.y);
+
+                // Limit the pull distance
+                Vector2 pullVector = new Vector2(slingEnd).sub(slingStart);
+                if (pullVector.len() > MAX_PULL_DISTANCE) {
+                    pullVector.setLength(MAX_PULL_DISTANCE);
+                    slingEnd.set(slingStart).add(pullVector);
+                }
+
+                // Update bird position while dragging
+                curBird.setPosition(slingEnd.x, slingEnd.y);
+                calculateTrajectory();
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+            if (isDragging) {
+                Vector2 impulse = new Vector2(slingStart).sub(slingEnd).scl(5); // Adjust force multiplier
+                curBird.getBody().applyLinearImpulse(impulse, curBird.getBody().getWorldCenter(), true);
+                curBird.unfreezeBird();
+                isDragging = false;
+                return true;
+            }
+            return false;
+        }
+    }
+
+    private void calculateTrajectory() {
+        trajectoryPoints.clear();
+
+        // Simulate trajectory
+        Vector2 initialVelocity = new Vector2(slingStart).sub(slingEnd).scl(5);
+        Vector2 tempPosition = new Vector2(curBird.getBody().getPosition());
+        Vector2 tempVelocity = new Vector2(initialVelocity);
+
+        float timeStep = 1 / 60f;
+        for (int i = 0; i < 60; i++) { // Adjust points for longer/shorter trajectory
+            tempVelocity.y += world.getGravity().y * timeStep;
+            tempPosition.mulAdd(tempVelocity, timeStep);
+            trajectoryPoints.add(new Vector2(tempPosition));
+        }
+    }
+
+    private void drawTrajectory() {
+        shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(1, 0, 0, 1); // Red color for trajectory
+        shapeRenderer.setColor(Color.RED);
 
-        Vector2 position = new Vector2(birdPosition);
-        Vector2 velocity = new Vector2(launchVelocity);
-
-        for (int i = 0; i < maxSteps; i++) {
-            // Calculate the new position based on the equations of motion
-            float t = timeStep * i;
-            float dx = velocity.x * t;
-            float dy = velocity.y * t + 0.5f * gravity * t * t;
-
-            // Update the position
-            position.set(birdPosition.x + dx, birdPosition.y + dy);
-
-            // Draw the point
-            shapeRenderer.circle(position.x, position.y, 5); // A small circle for each trajectory point
+        for (Vector2 point : trajectoryPoints) {
+            shapeRenderer.circle(point.x, point.y, 0.05f); // Small circles for trajectory
         }
 
         shapeRenderer.end();
     }
 
     @Override
-    public void dispose() {
-        shapeRenderer.dispose();
-        stage.dispose();
-        skin.dispose();
-        debugRenderer.dispose();
-        world.dispose(); // Don't forget to dispose of the world
-    }
-
-    @Override
     public void resize(int width, int height) {
-        stage.getViewport().update(width, height, true);
+        viewport.update(width, height);
     }
 
     @Override
-    public void pause() {}
+    public void show() {
+        Gdx.input.setInputProcessor(new GameInputAdapter());
+    }
 
     @Override
-    public void resume() {}
+    public void pause() {
+    }
 
     @Override
-    public void hide() {}
+    public void resume() {
+    }
+
+    @Override
+    public void hide() {
+    }
+
+    @Override
+    public void dispose() {
+        world.dispose();
+        debugRenderer.dispose();
+        slingshotTexture.dispose();
+        backgroundTexture.dispose();
+        curBird.dispose();
+        shapeRenderer.dispose();
+    }
 }
