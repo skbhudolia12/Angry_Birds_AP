@@ -63,9 +63,10 @@ public class Pig {
         region = new TextureRegion(texture);
     }
 
+
     private void createBody(float x, float y, World world) {
         BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.KinematicBody; // Kinematic body for pigs
+        bodyDef.type = BodyDef.BodyType.DynamicBody; // Kinematic body for pigs
         bodyDef.position.set(x, y);
 
         body = world.createBody(bodyDef);
@@ -78,9 +79,11 @@ public class Pig {
         fixtureDef.density = density;
         fixtureDef.friction = 0.6f;
         fixtureDef.restitution = 0.2f; // Less bouncy for pigs
-
+        body.setUserData(this);
         body.createFixture(fixtureDef);
         shape.dispose();
+
+
     }
 
     public void draw(SpriteBatch batch) {
@@ -128,7 +131,7 @@ public class Pig {
     }
 
     public void setVelocity(Vector2 velocity) {
-        if (body.getType() == BodyDef.BodyType.KinematicBody) {
+        if (body.getType() == BodyDef.BodyType.DynamicBody) {
             body.setLinearVelocity(velocity);
         }
     }
@@ -140,4 +143,13 @@ public class Pig {
     public boolean isMoving() {
         return body.getLinearVelocity().len() > 0.1f;
     }
+
+    public Body getBody() {
+        return body;
+    }
+
+    public float getRadius() {
+        return radius;
+    }
+
 }

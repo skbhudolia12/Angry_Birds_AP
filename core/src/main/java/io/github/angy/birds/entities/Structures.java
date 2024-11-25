@@ -101,10 +101,9 @@ public class Structures {
         region = new TextureRegion(texture); // Set the region for rendering
     }
 
-
     private void createBody(float x, float y, World world) {
         BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.StaticBody; // Structures are static
+        bodyDef.type = BodyDef.BodyType.DynamicBody; // Structures are static
         bodyDef.position.set(x, y);
 
         body = world.createBody(bodyDef);
@@ -115,11 +114,13 @@ public class Structures {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 1.5f; // Adjust density for sturdiness
-        fixtureDef.friction = 0.8f; // Adjust friction for collision interactions
-        fixtureDef.restitution = 0.2f; // Slight bounce
-
+        fixtureDef.friction = 0f; // Adjust friction for collision interactions
+        fixtureDef.restitution = 0f; // Slight bounce
+        body.setUserData(this);
         body.createFixture(fixtureDef);
         shape.dispose();
+
+
     }
 
     public void draw(SpriteBatch batch) {

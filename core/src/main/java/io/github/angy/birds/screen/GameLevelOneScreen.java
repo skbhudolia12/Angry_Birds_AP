@@ -55,6 +55,7 @@ public class GameLevelOneScreen implements Screen {
 
         // Box2D setup
         world = new World(new Vector2(0, -9.8f), true); // Gravity
+        world.setContactListener(new CollisionHandler());
         debugRenderer = new Box2DDebugRenderer();
 
         // Load textures
@@ -132,7 +133,7 @@ public class GameLevelOneScreen implements Screen {
         // Draw background, slingshot, and bird
         batch.begin();
         batch.draw(backgroundTexture, 0, 0, 16, 9); // Full screen background
-        batch.draw(slingshotTexture, 1.8f, 1.3f, 0.5f, 1); // Slingshot at fixed position
+        batch.draw(slingshotTexture, 1.8f, 1.3f, 0.5f, 1);
         curBird.draw(batch); // Draw bird
 
         // Draw pigs
