@@ -46,6 +46,10 @@ public class AngryBird extends Actor {
     private static final int BIGLIFE = 17;
     private static final int YELLOWLIFE = 12;
 
+    public String getType() {
+        return type;
+    }
+
     public AngryBird(float x, float y, World world, String type) {
         this.type = type;
         identify(type);

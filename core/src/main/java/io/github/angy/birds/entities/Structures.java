@@ -147,7 +147,7 @@ public class Structures {
         durability -= damage;
         if (durability <= 0) {
             isDestroyed = true;
-            dispose();
+
         }
     }
 
