@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import io.github.angy.birds.AngryBirdsGame;
 import io.github.angy.birds.entities.AngryBird;
 import io.github.angy.birds.entities.Pig;
 import io.github.angy.birds.entities.Structures;
@@ -22,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameLevelOneScreen implements Screen {
+    private final AngryBirdsGame game;
+    private final Screen nextLevel;
     SpriteBatch batch = new SpriteBatch();
     private OrthographicCamera camera;
     private Viewport viewport;
@@ -46,7 +49,9 @@ public class GameLevelOneScreen implements Screen {
     private List<Pig> pigs;
     private List<Structures> structures;
 
-    public GameLevelOneScreen() {
+    public GameLevelOneScreen(AngryBirdsGame game) {
+        this.game = game;
+        this.nextLevel = new GameLevelTwoScreen(game);
         // Setup camera and viewport
         camera = new OrthographicCamera();
         viewport = new FitViewport(16, 9, camera); // Aspect ratio: 16:9
@@ -135,6 +140,20 @@ public class GameLevelOneScreen implements Screen {
         batch.draw(backgroundTexture, 0, 0, 16, 9); // Full screen background
         batch.draw(slingshotTexture, 1.8f, 1.3f, 0.5f, 1);
         curBird.draw(batch); // Draw bird
+        if(isLaunched && !curBird.isMoving()) {
+            birdIndex++;
+            if (birdForLevel.length > birdIndex) {
+                curBird.dispose();
+                createBirds();
+                isLaunched = false;
+            }
+            else if (pigs.stream().allMatch(pig -> pig.isDead)) {
+                game.setScreen(new WinScreen(game,nextLevel));
+            }
+            else if(birdIndex >= birdForLevel.length) {
+                game.setScreen(new PauseScreen(game));
+            }
+        }
 
         // Draw pigs
         for (Pig pig : pigs) {

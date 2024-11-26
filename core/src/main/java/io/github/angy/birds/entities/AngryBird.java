@@ -230,4 +230,5 @@ public class AngryBird extends Actor {
         float height = 10 * radius;
         return new Rectangle(x, y, width, height);
     }
+
 }
