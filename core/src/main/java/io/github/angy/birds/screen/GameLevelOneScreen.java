@@ -386,7 +386,7 @@ public class GameLevelOneScreen implements Screen {
     private void checkWinOrLose() {
         // Check for lose condition: no more birds
         if (birdIndex >= birdForLevel.length) {
-            game.setScreen(new PauseScreen(game));
+            game.setScreen(new LevelFailScreen(game));
             return;
         }
 

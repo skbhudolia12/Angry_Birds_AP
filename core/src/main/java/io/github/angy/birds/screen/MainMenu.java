@@ -195,6 +195,8 @@ public class MainMenu implements Screen {
         if(Gdx.input.isKeyPressed(Input.Keys.P)){
             game.setScreen(new PauseScreen(game));
         }
+
+
     }
 
     @Override
