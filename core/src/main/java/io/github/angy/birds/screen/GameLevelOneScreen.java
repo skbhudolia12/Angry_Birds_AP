@@ -150,7 +150,7 @@ public class GameLevelOneScreen implements Screen {
             else if (pigs.stream().allMatch(pig -> pig.isDead)) {
                 game.setScreen(new WinScreen(game,nextLevel));
             }
-            else if(birdIndex >= birdForLevel.length) {
+            else {
                 game.setScreen(new PauseScreen(game));
             }
         }
