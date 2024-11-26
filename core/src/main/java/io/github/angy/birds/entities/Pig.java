@@ -26,7 +26,7 @@ public class Pig {
 
     public boolean isDead = false;
 
-    private static final int DEFAULT_LIFE = 20;
+    private static final int DEFAULT_LIFE = 1;
     private static final float DEFAULT_RADIUS = 0.3f;
     private static final float DEFAULT_DENSITY = 5f;
 
@@ -152,4 +152,7 @@ public class Pig {
         return radius;
     }
 
+    public void setDead (boolean b) {
+        isDead = b;
+    }
 }

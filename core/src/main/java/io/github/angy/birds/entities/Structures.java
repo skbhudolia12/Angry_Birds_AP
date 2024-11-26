@@ -12,12 +12,14 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 
+import javax.swing.*;
+
 public class Structures {
     private Body body;
     private Texture texture;
     private TextureRegion region;
-    private float width, height;
-    private int durability;
+    private float width, height, angle;
+    public int durability;
     private boolean isDestroyed = false;
 
     public Structures(float x, float y, float width, float height, World world, String texturePath, int durability) {
@@ -35,21 +37,21 @@ public class Structures {
                 texture = new Texture("ui/Angry Birds2.0/woodblock1.png");
                 width = 1f;
                 height = 0.5f;
-                durability = 20;
+                durability = 1;
                 break;
 
             case "woodblock2":
                 texture = new Texture("ui/Angry Birds2.0/woodblock2.png");
                 width = 2f;
                 height = 0.5f;
-                durability = 30;
+                durability = 1;
                 break;
 
             case "woodcone1":
                 texture = new Texture("ui/Angry Birds2.0/woodcone1.png");
                 width = 0.5f;
                 height = 1f;
-                durability = 25;
+                durability = 1;
                 break;
 
             case "glassblock1":
@@ -113,8 +115,8 @@ public class Structures {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 1.5f; // Adjust density for sturdiness
-        fixtureDef.friction = 0f; // Adjust friction for collision interactions
+        fixtureDef.density = 1f; // Adjust density for sturdiness
+        fixtureDef.friction = 1f; // Adjust friction for collision interactions
         fixtureDef.restitution = 0f; // Slight bounce
         body.setUserData(this);
         body.createFixture(fixtureDef);
@@ -145,6 +147,7 @@ public class Structures {
         durability -= damage;
         if (durability <= 0) {
             isDestroyed = true;
+            dispose();
         }
     }
 
@@ -162,7 +165,19 @@ public class Structures {
     }
 
     public void dispose() {
-        body.getWorld().destroyBody(body);
         texture.dispose();
+        body.getWorld().destroyBody(body);
+    }
+
+    public Body getBody () {
+        return body;
+    }
+
+    public void setDestroyed (boolean b) {
+        isDestroyed = b;
+    }
+
+    public boolean isMoving () {
+        return body.getLinearVelocity().len() > 0.1f;
     }
 }

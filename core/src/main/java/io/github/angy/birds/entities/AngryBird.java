@@ -44,7 +44,7 @@ public class AngryBird extends Actor {
 
     private static final int REDLIFE = 15;
     private static final int BIGLIFE = 17;
-    private static final int YELLOWLIFE = 15;
+    private static final int YELLOWLIFE = 12;
 
     public AngryBird(float x, float y, World world, String type) {
         this.type = type;
@@ -176,11 +176,15 @@ public class AngryBird extends Actor {
         body.getWorld().destroyBody(body);
         texture.dispose();
     }
+    public int getDamage(){
+        return (int)maxPower;
+    }
 
     public void onHit(int damage) {
         if (isDead) {
             return;
         }
+
         life -= damage;
     }
 
@@ -231,4 +235,7 @@ public class AngryBird extends Actor {
         return new Rectangle(x, y, width, height);
     }
 
+    public void setDead (boolean b) {
+        isDead = b;
+    }
 }

@@ -19,6 +19,8 @@ import io.github.angy.birds.entities.AngryBird;
 import io.github.angy.birds.entities.Pig;
 import io.github.angy.birds.entities.Structures;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,12 +44,13 @@ public class GameLevelOneScreen implements Screen {
     private ShapeRenderer shapeRenderer;
     private List<Vector2> trajectoryPoints;
 
-    private String[] birdForLevel = {"red", "yellow"};
+    private String[] birdForLevel = {"red", "yellow", "red", "red"};
     private int birdIndex = 0;
 
     // Add a list to store pigs
     private List<Pig> pigs;
     private List<Structures> structures;
+
 
     public GameLevelOneScreen(AngryBirdsGame game) {
         this.game = game;
@@ -91,8 +94,6 @@ public class GameLevelOneScreen implements Screen {
 
         // Add pigs with positions and types
         pigs.add(new Pig(10, 2, world, "small"));
-        pigs.add(new Pig(12, 2.5f, world, "small"));
-        pigs.add(new Pig(14, 3, world, "small"));
     }
 
     private void createStructures() {
@@ -100,10 +101,6 @@ public class GameLevelOneScreen implements Screen {
 
         // Add two woodblock1
         structures.add(new Structures(10, 1.5f, 1f, 0.5f, world, "woodblock1", 20));
-        structures.add(new Structures(12, 2.0f, 1f, 0.5f, world, "woodblock1", 20));
-
-        // Add one woodblock2
-        structures.add(new Structures(14, 2.5f, 2f, 0.5f, world, "woodblock2", 30));
     }
 
 
@@ -123,6 +120,23 @@ public class GameLevelOneScreen implements Screen {
 
         groundBody.createFixture(groundFixture);
         groundShape.dispose();
+
+        BodyDef leftWallDef = new BodyDef();
+        leftWallDef.position.set(0, 4.5f); // Adjust the position as needed
+        Body leftWallBody = world.createBody(leftWallDef);
+        PolygonShape leftWallShape = new PolygonShape();
+        leftWallShape.setAsBox(0.1f, 9); // Adjust the dimensions as needed
+        leftWallBody.createFixture(leftWallShape, 0);
+        leftWallShape.dispose();
+
+        // Right wall
+        BodyDef rightWallDef = new BodyDef();
+        rightWallDef.position.set(16, 4.5f); // Adjust the position as needed
+        Body rightWallBody = world.createBody(rightWallDef);
+        PolygonShape rightWallShape = new PolygonShape();
+        rightWallShape.setAsBox(0.1f, 9); // Adjust the dimensions as needed
+        rightWallBody.createFixture(rightWallShape, 0);
+        rightWallShape.dispose();
     }
 
     @Override
@@ -134,6 +148,7 @@ public class GameLevelOneScreen implements Screen {
         world.step(1 / 120f, 6, 2);
         camera.update();
         batch.setProjectionMatrix(camera.combined);
+
 
         // Draw background, slingshot, and bird
         batch.begin();
@@ -176,7 +191,99 @@ public class GameLevelOneScreen implements Screen {
         debugRenderer.render(world, camera.combined);
     }
 
-    private class GameInputAdapter extends InputAdapter {
+    private boolean isInstance(Fixture fixture, Class<?> clazz) {
+        return fixture.getUserData() != null && clazz.isInstance(fixture.getUserData());
+    }
+
+    private <T> T getCollisionEntity(Fixture fixtureA, Fixture fixtureB, Class<T> clazz) {
+        if (isInstance(fixtureA, clazz)) return clazz.cast(fixtureA.getUserData());
+        if (isInstance(fixtureB, clazz)) return clazz.cast(fixtureB.getUserData());
+        return null;
+    }
+
+    private void handleCollision(Contact contact) {
+        Fixture fixtureA = contact.getFixtureA();
+        Fixture fixtureB = contact.getFixtureB();
+
+        // Handle bird collision
+        AngryBird bird = getCollisionEntity(fixtureA, fixtureB, AngryBird.class);
+        if (bird != null) {
+            handleBirdCollision(bird, fixtureA, fixtureB, contact);
+        }
+
+        // Handle pig collision
+        Pig pig = getCollisionEntity(fixtureA, fixtureB, Pig.class);
+        if (pig != null) {
+            handlePigCollision(pig, fixtureA, fixtureB, contact);
+        }
+
+        // Handle structure collision
+        Structures structure = getCollisionEntity(fixtureA, fixtureB, Structures.class);
+        if (structure != null) {
+            handleStructureCollision(structure, fixtureA, fixtureB, contact);
+        }
+    }
+
+    private void handleBirdCollision(AngryBird bird, Fixture fixtureA, Fixture fixtureB, Contact contact) {
+        Vector2 point = contact.getWorldManifold().getPoints()[0];
+        float distance = point.dst(bird.getBody().getPosition());
+        Vector2 relativeVelocity = fixtureA.getBody().getLinearVelocity().sub(fixtureB.getBody().getLinearVelocity());
+        int damage = bird.calculateDamage(distance, relativeVelocity.len());
+        bird.onHit(damage);
+
+        if (bird.isDead) {
+        }
+    }
+
+    private void handlePigCollision(Pig pig, Fixture fixtureA, Fixture fixtureB, Contact contact) {
+        Vector2 relativeVelocity = fixtureA.getBody().getLinearVelocity().sub(fixtureB.getBody().getLinearVelocity());
+        int damage = (int) relativeVelocity.len() * 10;
+        pig.onHit(damage);
+        System.out.println(pig.getLife());
+
+        if (pig.isDead) {
+            pig.dispose();
+        }
+    }
+
+    private void handleStructureCollision(Structures structure, Fixture fixtureA, Fixture fixtureB, Contact contact) {
+        Vector2 relativeVelocity = fixtureA.getBody().getLinearVelocity().sub(fixtureB.getBody().getLinearVelocity());
+        int damage = (int) relativeVelocity.len() * 10;
+        structure.takeDamage(damage);
+        try (FileWriter writer = new FileWriter("structure_details.txt", true)) {
+    writer.write("Durability: " + structure.durability + "\n");
+} catch (IOException e) {
+    e.printStackTrace();
+};
+
+        if (structure.isDestroyed()) {
+            structure.dispose();
+        }
+    }
+
+    private class GameContactListener implements ContactListener {
+        @Override
+        public void beginContact(Contact contact) {
+            handleCollision(contact);
+        }
+
+        @Override
+        public void endContact(Contact contact) {
+            // Handle end contact events if necessary
+        }
+
+        @Override
+        public void preSolve(Contact contact, Manifold manifold) {
+            // Optional: Use for advanced collision handling
+        }
+
+        @Override
+        public void postSolve(Contact contact, ContactImpulse contactImpulse) {
+            // Optional: Use for advanced collision handling
+        }
+    }
+
+        private class GameInputAdapter extends InputAdapter {
         private static final float MAX_PULL_DISTANCE = 1f; // Set maximum pull distance in world units
 
         @Override
@@ -276,6 +383,22 @@ public class GameLevelOneScreen implements Screen {
         shapeRenderer.end();
     }
 
+    private void checkWinOrLose() {
+        // Check for lose condition: no more birds
+        if (birdIndex >= birdForLevel.length) {
+            game.setScreen(new PauseScreen(game));
+            return;
+        }
+
+        // Check for win condition: all pigs are dead and no objects are moving
+        boolean allPigsDead = pigs.stream().allMatch(pig -> pig.isDead);
+        boolean noObjectsMoving = pigs.stream().noneMatch(Pig::isMoving) && structures.stream().noneMatch(Structures::isMoving);
+
+        if (allPigsDead && noObjectsMoving) {
+            game.setScreen(new WinScreen(game, nextLevel));
+        }
+    }
+
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height);
@@ -284,6 +407,7 @@ public class GameLevelOneScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(new GameInputAdapter());
+        world.setContactListener(new GameContactListener());
     }
 
     @Override
