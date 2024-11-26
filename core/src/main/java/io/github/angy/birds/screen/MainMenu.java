@@ -38,6 +38,7 @@ public class MainMenu implements Screen {
     private Texture backgroundTexture;
     private TextureRegion backgroundTextureRegion;
     private TextureRegionDrawable backgroundDrawable;
+    private GameSound gameSound;
 
     public MainMenu(final AngryBirdsGame game) {
         this.game = game;
@@ -46,6 +47,7 @@ public class MainMenu implements Screen {
 
         loadAssets();
         createButtons();
+        gameSound = new GameSound();
     }
 
     private void loadAssets() {
@@ -113,6 +115,7 @@ public class MainMenu implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 game.setScreen(new LevelSelectionScreen(game));
+                gameSound.stopThemeSound();
             }
         });
         stage.addActor(playButton);
@@ -144,11 +147,11 @@ public class MainMenu implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if(flag[0]){
-                    //game.getMusic().pause();
+                    gameSound.stopThemeSound();
                     muteButton.setDrawable(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("ui/unmute_bird.png")))));
                     flag[0] = false;
                 } else {
-                    //game.getMusic().play();
+                    gameSound.playThemeSound();
                     muteButton.setDrawable(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("ui/mute_bird.png")))));
                     flag[0] = true;
                 }
@@ -197,6 +200,7 @@ public class MainMenu implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
+        gameSound.playThemeSound();
     }
 
     @Override
@@ -228,5 +232,6 @@ public class MainMenu implements Screen {
         stage.dispose();
         skin.dispose();
         backgroundTexture.dispose();
+        gameSound.themeDispose();
     }
 }

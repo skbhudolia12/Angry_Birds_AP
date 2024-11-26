@@ -23,6 +23,7 @@ public class LevelSelectionScreen implements Screen {
     private Image level1Button;
     private Image level2Button;
     private Image ReturnButton;
+    private GameSound gameSound;
 
     public LevelSelectionScreen(final AngryBirdsGame game) {
         this.game = game;
@@ -31,6 +32,7 @@ public class LevelSelectionScreen implements Screen {
 
         loadAssets();
         createButtons();
+        gameSound = new GameSound();
     }
 
     private void loadAssets() {
@@ -60,6 +62,7 @@ public class LevelSelectionScreen implements Screen {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                gameSound.stopLevelSelectionSound();
                 game.setScreen(new GameLevelOneScreen(game));
                 return true;
             }
@@ -83,6 +86,7 @@ public class LevelSelectionScreen implements Screen {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                gameSound.stopLevelSelectionSound();
                 game.setScreen(new GameLevelTwoScreen(game));
                 return true;
             }
@@ -109,6 +113,7 @@ public class LevelSelectionScreen implements Screen {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 game.setScreen(new MainMenu(game));
+                gameSound.stopLevelSelectionSound();
                 return true;
             }
         });
@@ -117,6 +122,8 @@ public class LevelSelectionScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
+        gameSound.stopThemeSound();
+        gameSound.playLevelSelectionSound();
     }
 
     @Override
