@@ -1,6 +1,6 @@
 
 # Angry Birds Game Documentation
-Created by [Sakshat](sak-drago.github.io) & [Sarthak]()
+Created by [Sakshat](https://sak-drago.github.io) & [Sarthak]()
 
 ![egg-loader-animation](https://github.com/user-attachments/assets/9acdf851-4c1e-4f5a-a282-ea23d4dda07d)
 
