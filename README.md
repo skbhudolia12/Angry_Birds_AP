@@ -1,20 +1,100 @@
-#Angry Birds Game (AP_Project_2024)
-Github repository owners - Sarthak Bhudolia (2023491) & Sakshat Sachdeva (2023474)
 
-This is our README File in accordance to Deadline 2 of our AP Project.
-- We have created our project on LibGDX.
-- To run the program, you must run the program using gradle in IntelliJ
-- On running, a loading screen will open up which will then take you to the Main Menu Screen of our game
-- Here, you can either choose to enter the game, mute/unmute the game or exit the game.
-- Upon exit, the code will be terminated and you will be out.
-- If you choose to enter the game, you will see the level selection menu.
-- Here we, have created level 1 with all the elements in it, however, level 2 is just a framework/background for the level.
-- You can navigate from the Level Selection screen to Main Menu with the back button located bottom left.
-- On entering Level 1, you can either choose to Pause the game using 'P' command on your keyboard.
-- In the Pause menu, you can navigate to restart the level, resume the level or quit back to the level selection screen.
-- While in Level 1, pressing the 'N' command on your keyboard, you will open the Level Completion Screen.
-- Here, you can either go to the next level i.e lvl 2, replay the level or quit back to main menu.
+# Angry Birds Game Documentation
+Created by [Sakshat](sak-drago.github.io) & [Sarthak]()
 
-This is a complete go through for our project submission.
+![egg-loader-animation](https://github.com/user-attachments/assets/9acdf851-4c1e-4f5a-a282-ea23d4dda07d)
 
-Thank you.
+## Introduction
+This project is a recreation of the popular Angry Birds game using Java, libGDX, and Box2D with a twist. The game implements physics-based gameplay, multiple levels, and features such as serialization and JUnit testing.
+---
+
+### Gif to be inserted
+
+---
+
+## Setup Instructions
+
+### Prerequisites
+- **Java**: Version 11 or higher.
+- **Gradle**: For dependency management.
+- **libGDX**: Game development framework (included in dependencies).
+- **Box2D**: Physics engine (integrated with libGDX).
+
+### Steps to Run the Game
+>Linux distributions
+
+1. Clone the repository from GitHub:
+    ```bash
+    git clone https://github.com/skbhudolia12/Angry_Birds_AP.git
+    ```
+2. Navigate to the project directory:
+    ```bash
+    cd Angry_Birds_AP-main
+    ```
+3. Build the project:
+    ```bash
+    gradle build
+    ```
+4. Run the game:
+    ```bash
+    java -jar build/libs/Angry_Bird_AP-main.jar
+    ```
+---
+![Screenshot from 2024-11-27 01-28-20](https://github.com/user-attachments/assets/c1d5d720-9c0e-4614-ad3c-34c569c442e1)
+
+## Features
+- **Physics-based gameplay**: Powered by the Box2D engine for realistic physics interactions.  
+- **Serialization**: Save and load game progress seamlessly.  
+- **Dynamic collision detection**: Manage damage calculations for birds, pigs, and structures.  
+- **Level progression**: Progress through multiple levels with increasing complexity.  
+- **Pause and Resume**: Pause the game and resume from where you left off.  
+- **Replay**: Restart levels at any time. 
+
+## OOP Principles and Design Patterns Used
+
+1. **Encapsulation**: 
+   - Sound resources are kept private within the `GameSound` class and accessed via public methods, hiding internal details.
+
+2. **Inheritance**: 
+   - Game screens implement LibGDX’s `Screen` interface, inheriting common screen functionalities.
+
+3. **Polymorphism**: 
+   - Overridden `InputListener` methods provide custom behavior for input events, allowing different responses based on the object.
+
+4. **Composition**: 
+   - Game screens compose multiple objects (like `Stage`, `World`, etc.) to manage game logic and rendering.
+
+5. **Singleton**: 
+   - The `GameSound` class acts as a Singleton, ensuring a single instance is used for sound management across the game.
+
+6. **Observer**: 
+   - **LibGDX**'s event-driven model, where buttons and objects listen for input events, follows the Observer pattern.  
+---
+
+
+## Serialization
+The game includes serialization to save and restore the state. The following attributes are saved:
+- Current level.  
+- Progress within the current level.  
+- States of all entities (Angry Birds, Pigs, Structures).  
+- Completed levels.
+
+---
+
+## JUnit Testing
+The project includes JUnit tests to validate critical functionalities:
+1. **Damage Validation**: Ensures that collision-based damage calculations are correct.  
+2. **Bird Iterator**: Verifies the correct iteration over available birds in a level.
+
+To run tests, execute:
+```bash
+gradle test
+```
+---
+### Acknowledgments
+
+- **[LibGDX](https://libgdx.badlogicgames.com/)**: Framework used to build the game.
+- **[Box2D](https://box2d.org/)**: Physics engine used to simulate the game's physical interactions.
+- **[FreeSound](https://freesound.org/)**: Sound assets provided by FreeSound.
+- **[Stack Overflow](https://stackoverflow.com/)**: For providing solutions and answers to various coding challenges.
+- **[GeeksforGeeks](https://www.geeksforgeeks.org/)**: For detailed tutorials and explanations of algorithms and game development concepts.
