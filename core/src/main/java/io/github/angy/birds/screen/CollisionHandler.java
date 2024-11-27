@@ -90,11 +90,6 @@ public class CollisionHandler implements ContactListener {
             pig.onHit(1);
         }
         bird.setLife(0);
-        bird.dispose();
-
-        if (pig.isDead) {
-            pig.dispose();
-        }
     }
 
     private void handlePigHitsPig(Pig pig1, Pig pig2) {
@@ -103,12 +98,6 @@ public class CollisionHandler implements ContactListener {
         pig1.onHit(1);
         pig2.onHit(1);
 
-        if (pig1.isDead) {
-            pig1.dispose();
-        }
-        if (pig2.isDead) {
-            pig2.dispose();
-        }
     }
 
     private void handleStructureHitsStructure(Structures structure1, Structures structure2) {
@@ -118,12 +107,6 @@ public class CollisionHandler implements ContactListener {
         structure1.takeDamage(1);
         structure2.takeDamage(1);
 
-        if (structure1.isDestroyed()) {
-            structure1.dispose();
-        }
-        if (structure2.isDestroyed()) {
-            structure2.dispose();
-        }
     }
 
 
@@ -133,11 +116,7 @@ public class CollisionHandler implements ContactListener {
             structure.takeDamage(1);
         }
         bird.setLife(0);
-        bird.dispose();
 
-        if (structure.isDestroyed()) {
-            structure.dispose();
-        }
     }
 
     private void handlePigHitsStructure(Pig pig, Structures structure) {
@@ -148,14 +127,6 @@ public class CollisionHandler implements ContactListener {
 
         pig.onHit(1);
         structure.takeDamage(1);
-        if (pig.isDead) {
-            pig.dispose();
-        }
-        if (structure.isDestroyed()) {
-            structure.dispose();
-        }
+
     }
-
-
-
 }
