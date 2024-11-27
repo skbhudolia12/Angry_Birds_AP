@@ -42,21 +42,21 @@ public class Pig {
             case "small":
                 texture = new Texture("ui/pigs/normalpig.png");
                 radius = DEFAULT_RADIUS;
-                life = DEFAULT_LIFE;
-                maxLife = DEFAULT_LIFE;
+                life = 1;
+                maxLife = 1;
                 density = DEFAULT_DENSITY;
                 break;
             case "large":
                 texture = new Texture("ui/pigs/helmetpig.png");
                 radius = DEFAULT_RADIUS * 1.5f;
-                life = DEFAULT_LIFE;
+                life = 2;
                 maxLife = life;
                 density = DEFAULT_DENSITY * 1.5f;
                 break;
             case "king":
                 texture = new Texture("ui/pigs/kingpig.png");
                 radius = DEFAULT_RADIUS;
-                life = DEFAULT_LIFE*2;
+                life = 3;
                 maxLife = life;
                 density = DEFAULT_DENSITY;
         }

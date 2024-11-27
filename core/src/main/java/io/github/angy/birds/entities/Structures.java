@@ -35,15 +35,15 @@ public class Structures {
         switch (type) {
             case "woodblock1":
                 texture = new Texture("ui/Angry Birds2.0/woodblock1.png");
-                width = 1f;
-                height = 0.5f;
+                width = 0.75f;
+                height = 0.75f;
                 durability = 1;
                 break;
 
             case "woodblock2":
                 texture = new Texture("ui/Angry Birds2.0/woodblock2.png");
-                width = 2f;
-                height = 0.5f;
+                width = 0.75f;
+                height = 0.75f;
                 durability = 1;
                 break;
 
@@ -56,36 +56,36 @@ public class Structures {
 
             case "glassblock1":
                 texture = new Texture("ui/Angry Birds2.0/glassblock1.png");
-                width = 1f;
-                height = 0.5f;
+                width = 0.75f;
+                height = 0.75f;
                 durability = 15;
                 break;
 
             case "glassblock2":
                 texture = new Texture("ui/Angry Birds2.0/glassblock2.png");
-                width = 2f;
-                height = 0.5f;
+                width = 0.75f;
+                height = 0.75f;
                 durability = 20;
                 break;
 
             case "glasscone1":
                 texture = new Texture("ui/Angry Birds2.0/glasscone1.png");
-                width = 0.5f;
+                width = 1f;
                 height = 1f;
                 durability = 18;
                 break;
 
             case "metalblock1":
                 texture = new Texture("ui/Angry Birds2.0/metalblock1.png");
-                width = 1f;
-                height = 0.5f;
+                width = 0.75f;
+                height = 0.75f;
                 durability = 50;
                 break;
 
             case "metalblock2":
                 texture = new Texture("ui/Angry Birds2.0/metalblock2.png");
-                width = 2f;
-                height = 0.5f;
+                width = 0.75f;
+                height = 0.75f;
                 durability = 60;
                 break;
 
