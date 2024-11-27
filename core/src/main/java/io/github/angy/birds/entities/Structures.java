@@ -164,11 +164,6 @@ public class Structures {
         );
     }
 
-    public void dispose() {
-        texture.dispose();
-        body.getWorld().destroyBody(body);
-    }
-
     public Body getBody () {
         return body;
     }

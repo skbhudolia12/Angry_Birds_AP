@@ -105,10 +105,7 @@ public class Pig {
         }
     }
 
-    public void dispose() {
-        body.getWorld().destroyBody(body);
-        texture.dispose();
-    }
+
 
     public void onHit(int damage) {
         if (isDead) return;

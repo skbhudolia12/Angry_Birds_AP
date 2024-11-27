@@ -51,17 +51,17 @@ public class GameLevelOneScreen implements Screen {
     // Add a list to store pigs
     private List<Pig> pigs;
     private List<Structures> structures;
-//    public List<AngryBird> deadbirds;
-//    public List<Pig> deadpigs;
-//    public List<Structures> destroyedstructures;
+    public List<AngryBird> deadbirds;
+    public List<Pig> deadpigs;
+    public List<Structures> destroyedstructures;
 
 
     public GameLevelOneScreen(AngryBirdsGame game) {
         this.game = game;
         this.nextLevel = new GameLevelTwoScreen(game);
-//        this.deadbirds = new ArrayList<>();
-//        this.deadpigs = new ArrayList<>();
-//        this.destroyedstructures = new ArrayList<>();
+        this.deadbirds = new ArrayList<>();
+        this.deadpigs = new ArrayList<>();
+        this.destroyedstructures = new ArrayList<>();
         // Setup camera and viewport
         camera = new OrthographicCamera();
         viewport = new FitViewport(16, 9, camera); // Aspect ratio: 16:9
@@ -153,6 +153,35 @@ public class GameLevelOneScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         world.step(1 / 120f, 6, 2);
+        //Process and clean up deadbirds
+        List<AngryBird> birdsToRemove = new ArrayList<>();
+        for (AngryBird bird : deadbirds) {
+            if (bird.isDead) {
+                world.destroyBody(bird.getBody());
+                birdsToRemove.add(bird);
+            }
+        }
+        deadbirds.removeAll(birdsToRemove);
+
+        // Process and clean up deadpigs
+        List<Pig> pigsToRemove = new ArrayList<>();
+        for (Pig pig : deadpigs) {
+            if (pig.isDead) {
+                world.destroyBody(pig.getBody());
+                pigsToRemove.add(pig);
+            }
+        }
+        deadpigs.removeAll(pigsToRemove);
+
+        // Process and clean up destroyed structures
+        List<Structures> structuresToRemove = new ArrayList<>();
+        for (Structures structure : destroyedstructures) {
+            if (structure.isDestroyed()) {
+                world.destroyBody(structure.getBody());
+                structuresToRemove.add(structure);
+            }
+        }
+        destroyedstructures.removeAll(structuresToRemove);
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
@@ -198,35 +227,6 @@ public class GameLevelOneScreen implements Screen {
 
         debugRenderer.render(world, camera.combined);
 
-        /* Process and clean up deadbirds
-        List<AngryBird> birdsToRemove = new ArrayList<>();
-        for (AngryBird bird : deadbirds) {
-            if (bird.isDead) {
-                world.destroyBody(bird.getBody());
-                birdsToRemove.add(bird);
-            }
-        }
-        deadbirds.removeAll(birdsToRemove);
-
-        // Process and clean up deadpigs
-        List<Pig> pigsToRemove = new ArrayList<>();
-        for (Pig pig : deadpigs) {
-            if (pig.isDead) {
-                world.destroyBody(pig.getBody());
-                pigsToRemove.add(pig);
-            }
-        }
-        deadpigs.removeAll(pigsToRemove);
-
-        // Process and clean up destroyed structures
-        List<Structures> structuresToRemove = new ArrayList<>();
-        for (Structures structure : destroyedstructures) {
-            if (structure.isDestroyed()) {
-                world.destroyBody(structure.getBody());
-                structuresToRemove.add(structure);
-            }
-        }
-        destroyedstructures.removeAll(structuresToRemove);*/
     }
 
 
@@ -278,10 +278,10 @@ public class GameLevelOneScreen implements Screen {
                 pig.onHit(1);
             }
             bird.setLife(0);
-            bird.dispose();
+            deadbirds.add(bird);
 
             if (pig.isDead) {
-                pig.dispose();
+                deadpigs.add(pig);
             }
         }
 
@@ -292,10 +292,10 @@ public class GameLevelOneScreen implements Screen {
             pig2.onHit(1);
 
             if (pig1.isDead) {
-                pig1.dispose();
+                deadpigs.add(pig1);
             }
             if (pig2.isDead) {
-                pig2.dispose();
+                deadpigs.add(pig2);
             }
         }
 
@@ -307,10 +307,10 @@ public class GameLevelOneScreen implements Screen {
             structure2.takeDamage(1);
 
             if (structure1.isDestroyed()) {
-                structure1.dispose();
+                destroyedstructures.add(structure1);
             }
             if (structure2.isDestroyed()) {
-                structure2.dispose();
+                destroyedstructures.add(structure2);
             }
         }
 
@@ -324,7 +324,7 @@ public class GameLevelOneScreen implements Screen {
             bird.dispose();
 
             if (structure.isDestroyed()) {
-                structure.dispose();
+                destroyedstructures.add(structure);
             }
         }
 
@@ -337,10 +337,10 @@ public class GameLevelOneScreen implements Screen {
             pig.onHit(1);
             structure.takeDamage(1);
             if (pig.isDead) {
-                pig.dispose();
+                deadpigs.add(pig);
             }
             if (structure.isDestroyed()) {
-                structure.dispose();
+                destroyedstructures.add(structure);
             }
         }
 
@@ -494,13 +494,13 @@ public class GameLevelOneScreen implements Screen {
         curBird.dispose();
         shapeRenderer.dispose();
 
-        // Dispose pigs
-        for (Pig pig : pigs) {
-            pig.dispose();
-        }
-
-        for(Structures structure : structures) {
-            structure.dispose();
-        }
+//        // Dispose pigs
+//        for (Pig pig : pigs) {
+//            pig.dispose();
+//        }
+//
+//        for(Structures structure : structures) {
+//            structure.dispose();
+//        }
     }
 }

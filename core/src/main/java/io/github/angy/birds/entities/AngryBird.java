@@ -160,6 +160,7 @@ public class AngryBird extends Actor {
             texture = new Texture("textures/backgrounds/TransparentRectangle.png");
         }
 
+        assert texture != null;
         region = new TextureRegion(texture);
     }
 
