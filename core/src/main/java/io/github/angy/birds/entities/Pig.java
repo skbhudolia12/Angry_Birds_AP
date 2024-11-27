@@ -99,10 +99,6 @@ public class Pig {
             1f, 1f,
             angle * MathUtils.radiansToDegrees
         );
-
-        if (life <= 0) {
-            isDead = true;
-        }
     }
 
 
@@ -147,10 +143,6 @@ public class Pig {
 
     public float getRadius() {
         return radius;
-    }
-
-    public void setDead (boolean b) {
-        isDead = b;
     }
 
     public void dispose() {

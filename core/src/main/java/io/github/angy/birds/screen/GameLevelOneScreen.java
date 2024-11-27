@@ -50,6 +50,7 @@ public class GameLevelOneScreen implements Screen {
     // Add a list to store pigs
     private List<Pig> pigs;
     private List<Structures> structures;
+    private ArrayList<Body> bodiesToDestroy = new ArrayList<>();
 
 
     public GameLevelOneScreen(AngryBirdsGame game) {
@@ -145,26 +146,25 @@ public class GameLevelOneScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         world.step(1 / 120f, 6, 2);
+        handleBodyDestruction();
         camera.update();
         batch.setProjectionMatrix(camera.combined);
-
 
         // Draw background, slingshot, and bird
         batch.begin();
         batch.draw(backgroundTexture, 0, 0, 16, 9); // Full screen background
         batch.draw(slingshotTexture, 1.8f, 1.3f, 0.5f, 1);
         curBird.draw(batch); // Draw bird
-        if(isLaunched && !curBird.isMoving()) {
+
+        if (isLaunched && !curBird.isMoving()) {
             birdIndex++;
             if (birdForLevel.length > birdIndex) {
                 curBird.dispose();
                 createBirds();
                 isLaunched = false;
-            }
-            else if (pigs.stream().allMatch(pig -> pig.isDead)) {
-                game.setScreen(new WinScreen(game,nextLevel));
-            }
-            else {
+            } else if (pigs.stream().allMatch(pig -> pig.isDead)) {
+                game.setScreen(new WinScreen(game, nextLevel));
+            } else {
                 game.setScreen(new PauseScreen(game));
             }
         }
@@ -176,11 +176,13 @@ public class GameLevelOneScreen implements Screen {
             }
         }
 
-        for(Structures structure : structures) {
-            if(!structure.isDestroyed()) {
+        // Draw structures
+        for (Structures structure : structures) {
+            if (!structure.isDestroyed()) {
                 structure.draw(batch);
             }
         }
+
         batch.end();
 
         if (isDragging) {
@@ -213,13 +215,13 @@ public class GameLevelOneScreen implements Screen {
         // Handle pig collision
         Pig pig = getCollisionEntity(fixtureA, fixtureB, Pig.class);
         if (pig != null) {
-            handlePigCollision(pig, fixtureA, fixtureB, contact);
+            handlePigCollision(pig);
         }
 
         // Handle structure collision
         Structures structure = getCollisionEntity(fixtureA, fixtureB, Structures.class);
         if (structure != null) {
-            handleStructureCollision(structure, fixtureA, fixtureB, contact);
+            handleStructureCollision(structure);
         }
     }
 
@@ -228,37 +230,53 @@ public class GameLevelOneScreen implements Screen {
         float distance = point.dst(bird.getBody().getPosition());
         Vector2 relativeVelocity = fixtureA.getBody().getLinearVelocity().sub(fixtureB.getBody().getLinearVelocity());
         int damage = bird.calculateDamage(distance, relativeVelocity.len());
-        bird.onHit(damage);
+        bird.onHit(1);
 
         if (bird.isDead) {
+            // Immediately add the bird's body to be destroyed
+            bodiesToDestroy.add(bird.getBody());
+            // Dispose of the bird's texture
+            bird.dispose();
         }
     }
 
-    private void handlePigCollision(Pig pig, Fixture fixtureA, Fixture fixtureB, Contact contact) {
-        Vector2 relativeVelocity = fixtureA.getBody().getLinearVelocity().sub(fixtureB.getBody().getLinearVelocity());
-        int damage = (int) relativeVelocity.len() * 10;
-        pig.onHit(damage);
-        System.out.println(pig.getLife());
-
-        if (pig.isDead) {
-            pig.dispose();
+    private void handlePigCollision(Pig pig) {
+        if (!pig.isDead) {
+            pig.onHit(1); // Deal 1 damage to pig
+            if (pig.isDead) {
+                // Immediately add the pig's body to be destroyed
+                bodiesToDestroy.add(pig.getBody());
+                // Dispose of the pig's texture
+                pig.dispose();
+            }
         }
     }
 
-    private void handleStructureCollision(Structures structure, Fixture fixtureA, Fixture fixtureB, Contact contact) {
-        Vector2 relativeVelocity = fixtureA.getBody().getLinearVelocity().sub(fixtureB.getBody().getLinearVelocity());
-        int damage = (int) relativeVelocity.len() * 10;
-        structure.takeDamage(damage);
-        try (FileWriter writer = new FileWriter("structure_details.txt", true)) {
-            writer.write("Durability: " + structure.durability + "\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        };
-
-        if (structure.isDestroyed()) {
-            structure.dispose();
+    private void handleStructureCollision(Structures structure) {
+        if (!structure.isDestroyed()) {
+            structure.takeDamage(1); // Deal 1 damage to structure
+            if (structure.isDestroyed()) {
+                // Immediately add the structure's body to be destroyed
+                bodiesToDestroy.add(structure.getBody());
+                // Dispose of the structure's texture
+                structure.dispose();
+            }
         }
     }
+
+    private void handleBodyDestruction() {
+        // Try to destroy bodies outside of the physics simulation step
+        for (Body body : bodiesToDestroy) {
+            if (world.isLocked()) {
+                // If the world is locked (during collision), skip this frame
+                return;
+            }
+            // Remove the body from the world
+            world.destroyBody(body);
+        }
+        bodiesToDestroy.clear();
+    }
+
 
     private class GameContactListener implements ContactListener {
         @Override
@@ -352,7 +370,7 @@ public class GameLevelOneScreen implements Screen {
         float timeStep = 1 / 120f;
 
         // Simulate trajectory points
-        for (int i = 0; i < 120; i++) { // Adjust the number of points as needed
+        for (int i = 0; i < 180; i++) { // Adjust the number of points as needed
             // Update velocity due to gravity
             tempVelocity.y += world.getGravity().y * timeStep;
 
@@ -429,14 +447,5 @@ public class GameLevelOneScreen implements Screen {
         backgroundTexture.dispose();
         curBird.dispose();
         shapeRenderer.dispose();
-
-        // Dispose pigs
-        for (Pig pig : pigs) {
-            pig.dispose();
-        }
-
-        for(Structures structure : structures) {
-            structure.dispose();
-        }
     }
 }
