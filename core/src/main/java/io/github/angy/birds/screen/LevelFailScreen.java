@@ -47,7 +47,7 @@ public class LevelFailScreen implements Screen {
    private void createButtons() {
     retryButton = new Image(new Texture(Gdx.files.internal("ui/RestartWinScreen.png")));
     retryButton.setSize(200, 200);
-    retryButton.setPosition((stage.getWidth() - retryButton.getWidth()) / 2 + 200, stage.getHeight() / 2 + 50);
+    retryButton.setPosition((stage.getWidth() - retryButton.getWidth()) / 2 + 500, stage.getHeight() / 2 - 50);
     retryButton.addListener(new ClickListener() {
         @Override
         public void clicked(InputEvent event, float x, float y) {
@@ -76,7 +76,7 @@ public class LevelFailScreen implements Screen {
 
     mainMenuButton = new Image(new Texture(Gdx.files.internal("ui/exitButton_bird.png")));
     mainMenuButton.setSize(200, 200);
-    mainMenuButton.setPosition((stage.getWidth() - mainMenuButton.getWidth()) / 2 + 200, stage.getHeight() / 2 - 100);
+    mainMenuButton.setPosition((stage.getWidth() - mainMenuButton.getWidth()) / 2 + 500, stage.getHeight() / 2 - 300);
     mainMenuButton.addListener(new ClickListener() {
         @Override
         public void clicked(InputEvent event, float x, float y) {
