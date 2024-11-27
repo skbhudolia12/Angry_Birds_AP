@@ -320,7 +320,7 @@ public class GameLevelOneScreen implements Screen {
         float timeStep = 1 / 120f;
 
         // Simulate trajectory points
-        for (int i = 0; i < 120; i++) { // Adjust the number of points as needed
+        for (int i = 0; i < 180; i++) { // Adjust the number of points as needed
             // Update velocity due to gravity
             tempVelocity.y += world.getGravity().y * timeStep;
 
