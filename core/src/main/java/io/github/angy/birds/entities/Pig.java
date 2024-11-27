@@ -156,4 +156,8 @@ public class Pig {
     public void dispose() {
         texture.dispose();
     }
+
+    public boolean isDead () {
+        return isDead;
+    }
 }

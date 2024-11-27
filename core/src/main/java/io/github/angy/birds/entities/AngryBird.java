@@ -29,6 +29,7 @@ public class AngryBird extends Actor {
     public boolean isFlying = false;
     public boolean isReady = false;
     public boolean isDead = false;
+    private boolean initialContact = false;
 
     private static final float MAXRED = 10f;
     private static final float MAXBIG = 40f;
@@ -243,5 +244,13 @@ public class AngryBird extends Actor {
 
     public String getType() {
         return type;
+    }
+
+    public boolean checkInitialContact() {
+        return initialContact;
+    }
+
+    public boolean flagInitialContact() {
+        return initialContact = true;
     }
 }

@@ -142,12 +142,13 @@ public class Structures {
     }
 
     public void takeDamage(int damage) {
-        if (isDestroyed) return;
-
         durability -= damage;
+        System.out.println("Structure durability: " + durability);
+        System.out.println("Structure damage taken: " + damage);
         if (durability <= 0) {
             isDestroyed = true;
-            dispose();
+            System.out.println("Structure destroyed!");
+            disposeTexture();
         }
     }
 
@@ -176,7 +177,14 @@ public class Structures {
         return body.getLinearVelocity().len() > 0.1f;
     }
 
-    public void dispose() {
-        texture.dispose();
+    public void disposeTexture () {
+        if(texture!=null){
+            texture.dispose();
+            texture = null;
+        }
+    }
+
+    public int getDurability () {
+        return durability;
     }
 }

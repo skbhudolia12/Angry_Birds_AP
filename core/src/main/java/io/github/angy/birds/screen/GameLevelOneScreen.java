@@ -32,6 +32,7 @@ public class GameLevelOneScreen implements Screen {
     private Viewport viewport;
 
     private World world;
+    private Body groundBody;
     private Box2DDebugRenderer debugRenderer;
 
     private AngryBird curBird;
@@ -51,6 +52,7 @@ public class GameLevelOneScreen implements Screen {
     private List<Pig> pigs;
     private List<Structures> structures;
 
+    private List<Body> bodiestoDestroy = new ArrayList<>();
 
     public GameLevelOneScreen(AngryBirdsGame game) {
         this.game = game;
@@ -108,7 +110,7 @@ public class GameLevelOneScreen implements Screen {
         BodyDef groundBodyDef = new BodyDef();
         groundBodyDef.position.set(8, 0);
 
-        Body groundBody = world.createBody(groundBodyDef);
+        groundBody = world.createBody(groundBodyDef);
 
         PolygonShape groundShape = new PolygonShape();
         groundShape.setAsBox(8, 1.25f); // Width 16, Height 1
@@ -138,147 +140,113 @@ public class GameLevelOneScreen implements Screen {
         rightWallShape.dispose();
     }
 
-    @Override
-    public void render(float delta) {
-        // Clear screen
-        Gdx.gl.glClearColor(0.5f, 0.7f, 1f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        world.step(1 / 120f, 6, 2);
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
-
-
-        // Draw background, slingshot, and bird
-        batch.begin();
-        batch.draw(backgroundTexture, 0, 0, 16, 9); // Full screen background
-        batch.draw(slingshotTexture, 1.8f, 1.3f, 0.5f, 1);
-        curBird.draw(batch); // Draw bird
-        if(isLaunched && !curBird.isMoving()) {
-            birdIndex++;
-            if (birdForLevel.length > birdIndex) {
-                curBird.dispose();
-                createBirds();
-                isLaunched = false;
-            }
-            else if (pigs.stream().allMatch(pig -> pig.isDead)) {
-                game.setScreen(new WinScreen(game,nextLevel));
-            }
-            else {
-                game.setScreen(new PauseScreen(game));
-            }
-        }
-
-        // Draw pigs
-        for (Pig pig : pigs) {
-            if (!pig.isDead) {
-                pig.draw(batch);
-            }
-        }
-
-        for(Structures structure : structures) {
-            if(!structure.isDestroyed()) {
-                structure.draw(batch);
-            }
-        }
-        batch.end();
-
-        if (isDragging) {
-            drawTrajectory();
-        }
-
-        debugRenderer.render(world, camera.combined);
-    }
-
-    private boolean isInstance(Fixture fixture, Class<?> clazz) {
-        return fixture.getUserData() != null && clazz.isInstance(fixture.getUserData());
-    }
-
-    private <T> T getCollisionEntity(Fixture fixtureA, Fixture fixtureB, Class<T> clazz) {
-        if (isInstance(fixtureA, clazz)) return clazz.cast(fixtureA.getUserData());
-        if (isInstance(fixtureB, clazz)) return clazz.cast(fixtureB.getUserData());
-        return null;
-    }
-
-    private void handleCollision(Contact contact) {
-        Fixture fixtureA = contact.getFixtureA();
-        Fixture fixtureB = contact.getFixtureB();
-
-        // Handle bird collision
-        AngryBird bird = getCollisionEntity(fixtureA, fixtureB, AngryBird.class);
-        if (bird != null) {
-            handleBirdCollision(bird, fixtureA, fixtureB, contact);
-        }
-
-        // Handle pig collision
-        Pig pig = getCollisionEntity(fixtureA, fixtureB, Pig.class);
-        if (pig != null) {
-            handlePigCollision(pig, fixtureA, fixtureB, contact);
-        }
-
-        // Handle structure collision
-        Structures structure = getCollisionEntity(fixtureA, fixtureB, Structures.class);
-        if (structure != null) {
-            handleStructureCollision(structure, fixtureA, fixtureB, contact);
-        }
-    }
-
-    private void handleBirdCollision(AngryBird bird, Fixture fixtureA, Fixture fixtureB, Contact contact) {
-        Vector2 point = contact.getWorldManifold().getPoints()[0];
-        float distance = point.dst(bird.getBody().getPosition());
-        Vector2 relativeVelocity = fixtureA.getBody().getLinearVelocity().sub(fixtureB.getBody().getLinearVelocity());
-        int damage = bird.calculateDamage(distance, relativeVelocity.len());
-        bird.onHit(damage);
-
-        if (bird.isDead) {
-        }
-    }
-
-    private void handlePigCollision(Pig pig, Fixture fixtureA, Fixture fixtureB, Contact contact) {
-        Vector2 relativeVelocity = fixtureA.getBody().getLinearVelocity().sub(fixtureB.getBody().getLinearVelocity());
-        int damage = (int) relativeVelocity.len() * 10;
-        pig.onHit(damage);
-        System.out.println(pig.getLife());
-
-        if (pig.isDead) {
-            pig.dispose();
-        }
-    }
-
-    private void handleStructureCollision(Structures structure, Fixture fixtureA, Fixture fixtureB, Contact contact) {
-        Vector2 relativeVelocity = fixtureA.getBody().getLinearVelocity().sub(fixtureB.getBody().getLinearVelocity());
-        int damage = (int) relativeVelocity.len() * 10;
-        structure.takeDamage(damage);
-        try (FileWriter writer = new FileWriter("structure_details.txt", true)) {
-            writer.write("Durability: " + structure.durability + "\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        };
-
-        if (structure.isDestroyed()) {
-            structure.dispose();
-        }
+    public Body getGroundBody(){
+        return groundBody;
     }
 
     private class GameContactListener implements ContactListener {
         @Override
         public void beginContact(Contact contact) {
-            handleCollision(contact);
+            Fixture fixtureA = contact.getFixtureA();
+            Fixture fixtureB = contact.getFixtureB();
+
+            Body bodyA = fixtureA.getBody();
+            Body bodyB = fixtureB.getBody();
+
+            // Handle pig collisions
+            if (isPigBody(bodyA)) {
+                if (isMaterialBody(bodyB) || isPigBody(bodyB) || isGroundBody(bodyB)) handlePigCollision(bodyA);
+                else if (isBirdBody(bodyB)) killPig(bodyA, bodyB);
+            } else if (isPigBody(bodyB)) {
+                if (isMaterialBody(bodyA) || isPigBody(bodyA) || isGroundBody(bodyA)) handlePigCollision(bodyB);
+                else if (isBirdBody(bodyA)) killPig(bodyB, bodyA);
+            }
+
+            // Handle material collisions
+            if (isMaterialBody(bodyA)) {
+                if (isMaterialBody(bodyB) || isPigBody(bodyB) || isGroundBody(bodyB)) handleMaterialCollision(bodyA);
+                else if (isBirdBody(bodyB)) destroyMaterial(bodyA, bodyB);
+            } else if (isMaterialBody(bodyB)) {
+                if (isMaterialBody(bodyA) || isPigBody(bodyA) || isGroundBody(bodyA)) handleMaterialCollision(bodyB);
+                else if (isBirdBody(bodyA)) destroyMaterial(bodyB, bodyA);
+            }
+        }
+
+        private void destroyMaterial(Body materialBody, Body birdBody) {
+            Structures structure = (Structures) materialBody.getUserData();
+            AngryBird bird = (AngryBird) birdBody.getUserData();
+            if (bird.checkInitialContact()) {
+                handleMaterialCollision(materialBody);
+            } else {
+                structure.takeDamage(structure.getDurability());
+                if (structure.isDestroyed()) {
+                    System.out.println("Material destroyed! Queuing for destruction.");
+                    materialBody.setUserData(null);
+                    bodiestoDestroy.add(structure.getBody());
+                }
+            }
+        }
+
+        private void killPig(Body pigBody, Body birdBody) {
+            Pig pig = (Pig) pigBody.getUserData();
+            AngryBird bird = (AngryBird) birdBody.getUserData();
+            if (bird.checkInitialContact()) {
+                handlePigCollision(pigBody);
+            } else {
+                bird.flagInitialContact();
+                pig.onHit(pig.getLife());
+                System.out.println("Pig destroyed! Queuing for destruction.");
+                pigBody.setUserData(null);
+                bodiestoDestroy.add(pigBody);
+            }
         }
 
         @Override
-        public void endContact(Contact contact) {
-            // Handle end contact events if necessary
-        }
+        public void endContact(Contact contact) {}
 
         @Override
-        public void preSolve(Contact contact, Manifold manifold) {
-            // Optional: Use for advanced collision handling
-        }
+        public void preSolve(Contact contact, Manifold oldManifold) {}
 
         @Override
-        public void postSolve(Contact contact, ContactImpulse contactImpulse) {
-            // Optional: Use for advanced collision handling
+        public void postSolve(Contact contact, ContactImpulse impulse) {}
+
+        private boolean isPigBody(Body body) {
+            return body.getUserData() instanceof Pig;
+        }
+
+        private boolean isMaterialBody(Body body) {
+            return body.getUserData() instanceof Structures;
+        }
+
+        private boolean isBirdBody(Body body) {
+            return body.getUserData() instanceof AngryBird;
+        }
+
+        private boolean isGroundBody(Body body) {
+            // Assuming groundBody is a predefined Body instance representing the ground
+            return body == getGroundBody();
+        }
+
+        private void handlePigCollision(Body pigBody) {
+            Pig pig = (Pig) pigBody.getUserData();
+            int impactForce = 15; // Simulated impact force
+            pig.onHit(impactForce * 10);
+            if (pig.isDead()) {
+                System.out.println("Pig destroyed! Queuing for destruction.");
+                pigBody.setUserData(null);
+                pig.dispose();
+            }
+        }
+
+        private void handleMaterialCollision(Body materialBody) {
+            Structures structure = (Structures) materialBody.getUserData();
+            int impactForce = 15; // Simulated impact force
+            structure.takeDamage(impactForce * 5);
+            if (structure.isDestroyed()) {
+                System.out.println("Material destroyed! Queuing for destruction.");
+                materialBody.setUserData(null);
+                structure.disposeTexture();
+            }
         }
     }
 
@@ -420,6 +388,57 @@ public class GameLevelOneScreen implements Screen {
     @Override
     public void hide() {
     }
+@Override
+public void render(float delta) {
+    // Clear screen
+    Gdx.gl.glClearColor(0.5f , 0.7f , 1f , 1);
+    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+    world.step(1 / 120f , 6 , 2);
+    camera.update();
+    batch.setProjectionMatrix(camera.combined);
+    for (Body body : bodiestoDestroy) {
+        world.destroyBody(body);
+    }
+    bodiestoDestroy.clear();
+    // Draw background, slingshot, and bird
+    batch.begin();
+    batch.draw(backgroundTexture , 0 , 0 , 16 , 9); // Full screen background
+    batch.draw(slingshotTexture , 1.8f , 1.3f , 0.5f , 1);
+    curBird.draw(batch); // Draw bird
+    if (isLaunched && !curBird.isMoving()) {
+        birdIndex++;
+        if (birdForLevel.length > birdIndex) {
+            curBird.dispose();
+            createBirds();
+            isLaunched = false;
+        } else if (pigs.stream().allMatch(pig -> pig.isDead)) {
+            game.setScreen(new WinScreen(game , nextLevel));
+        } else {
+            game.setScreen(new PauseScreen(game));
+        }
+    }
+
+    // Draw pigs
+    for (Pig pig : pigs) {
+        if (!pig.isDead) {
+            pig.draw(batch);
+        }
+    }
+
+    for (Structures structure : structures) {
+        if (!structure.isDestroyed()) {
+            structure.draw(batch);
+        }
+    }
+    batch.end();
+
+    if (isDragging) {
+        drawTrajectory();
+    }
+
+    debugRenderer.render(world , camera.combined);
+}
 
     @Override
     public void dispose() {
@@ -436,7 +455,7 @@ public class GameLevelOneScreen implements Screen {
         }
 
         for(Structures structure : structures) {
-            structure.dispose();
+            structure.disposeTexture();
         }
     }
 }
