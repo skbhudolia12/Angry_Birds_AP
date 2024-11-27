@@ -46,6 +46,7 @@ public class GameLevelTwoScreen implements Screen {
     private List<Vector2> trajectoryPoints;
 
     private String[] birdForLevel = {"red", "yellow", "green"};
+    public int score;
     private int birdIndex = 0;
 
     private List<Pig> pigs;
@@ -399,7 +400,7 @@ public class GameLevelTwoScreen implements Screen {
                 createBirds();
                 isLaunched = false;
             } else if (pigs.stream().allMatch(pig -> pig.isDead)) {
-                game.setScreen(new WinScreen(game , nextLevel));
+                game.setScreen(new WinScreen(game , nextLevel,score,2000));
             } else {
                 game.setScreen(new LevelFailScreen(game));
             }

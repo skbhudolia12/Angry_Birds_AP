@@ -15,12 +15,18 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import io.github.angy.birds.AngryBirdsGame;
+import io.github.angy.birds.utils.LevelProgress;
+
+import static io.github.angy.birds.utils.LoadSave.loadProgress;
 
 public class LevelSelectionScreen implements Screen {
     private final AngryBirdsGame game;
     private Stage stage;
     private Skin skin;
     private Image backgroundImage;
+    private LevelProgress progress;
+    private int score;
+    private boolean completed;
     private Image level1Button;
     private Image level2Button;
     private Image level3Button;
@@ -52,6 +58,25 @@ public class LevelSelectionScreen implements Screen {
         level1Button = new Image(new Texture(Gdx.files.internal("ui/level1Button.png")));
         level1Button.setSize(55, 75);
         level1Button.setPosition(910, 300);
+        progress =  loadProgress(1);
+        score = progress.getScore();
+        completed = progress.isCompleted();
+        if(completed){
+            if(score<=500){
+                level1Button = new Image(new Texture(Gdx.files.internal("ui/level1complete_1star.png")));
+                level1Button.setSize(55, 75);
+                level1Button.setPosition(910, 300);
+            } else if (score<=1000) {
+                level1Button = new Image(new Texture(Gdx.files.internal("ui/level1complete_2star.png")));
+                level1Button.setSize(55, 75);
+                level1Button.setPosition(910, 300);
+            }
+            else{
+                level1Button = new Image(new Texture(Gdx.files.internal("ui/level1complete_3star.png")));
+                level1Button.setSize(55, 75);
+                level1Button.setPosition(910, 300);
+            }
+        }
         level1Button.addListener(new InputListener() {
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                 level1Button.addAction(Actions.scaleTo(1.1f, 1.1f, 0.2f));

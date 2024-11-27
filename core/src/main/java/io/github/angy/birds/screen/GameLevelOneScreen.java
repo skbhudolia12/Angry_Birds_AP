@@ -19,6 +19,8 @@
     import io.github.angy.birds.entities.AngryBird;
     import io.github.angy.birds.entities.Pig;
     import io.github.angy.birds.entities.Structures;
+    import io.github.angy.birds.utils.LevelProgress;
+    import io.github.angy.birds.utils.LoadSave;
 
     import java.io.FileWriter;
     import java.io.IOException;
@@ -48,6 +50,7 @@
         private List<Vector2> trajectoryPoints;
 
         private String[] birdForLevel = {"red", "yellow", "green"};
+        public int score = 0;
         private int birdIndex = 0;
 
         // Add a list to store pigs
@@ -55,6 +58,7 @@
         private List<Structures> structures;
 
         private List<Body> bodiestoDestroy = new ArrayList<>();
+        private boolean isCompleted = false;
 
         public GameLevelOneScreen(AngryBirdsGame game) {
             this.game = game;
@@ -185,6 +189,7 @@
                     structure.takeDamage(structure.getDurability());
                     if (structure.isDestroyed()) {
                         System.out.println("Material destroyed! Queuing for destruction.");
+                        score+=100;
                         materialBody.setUserData(null);
                         bodiestoDestroy.add(structure.getBody());
                     }
@@ -200,6 +205,7 @@
                     bird.flagInitialContact();
                     pig.onHit(pig.getLife());
                     System.out.println("Pig destroyed! Queuing for destruction.");
+                    score+=200;
                     pigBody.setUserData(null);
                     bodiestoDestroy.add(pigBody);
                 }
@@ -248,6 +254,7 @@
                 structure.takeDamage(impactForce);
                 if (structure.isDestroyed()) {
                     System.out.println("Material destroyed! Queuing for destruction.");
+                    score= score + 150;
                     materialBody.setUserData(null);
                     structure.disposeTexture();
                 }
@@ -378,6 +385,7 @@
 
         @Override
         public void pause() {
+            saveGameProgress();
         }
 
         @Override
@@ -387,6 +395,18 @@
         @Override
         public void hide() {
         }
+
+        public void saveGameProgress() {
+            LevelProgress progress = new LevelProgress(score, isCompleted);
+            LoadSave.saveProgress(1, progress);
+        }
+
+        public void loadGameProgress() {
+            LevelProgress progress = LoadSave.loadProgress(1);
+            this.score = progress.getScore();
+            this.isCompleted = progress.isCompleted();
+        }
+
 
     @Override
     public void render(float delta) {
@@ -410,11 +430,19 @@
             if (birdForLevel.length > birdIndex) {
                 curBird.dispose();
                 createBirds();
+                System.out.println("Bird Changed. Score Right now "+ score);
                 isLaunched = false;
-            } else if (pigs.stream().allMatch(pig -> pig.isDead)) {
-                game.setScreen(new WinScreen(game , nextLevel));
-            } else {
+            }
+            else {
+              if(score < 300){
                 game.setScreen(new LevelFailScreen(game));
+                saveGameProgress();
+              }
+              else{
+                game.setScreen(new WinScreen(game, nextLevel ,score,2000));
+                isCompleted = true;
+                saveGameProgress();
+              }
             }
         }
 

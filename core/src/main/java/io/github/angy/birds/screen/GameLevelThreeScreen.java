@@ -46,6 +46,7 @@ public class GameLevelThreeScreen implements Screen {
     private List<Vector2> trajectoryPoints;
 
     private String[] birdForLevel = {"blue", "red", "yellow"};
+    public int score;
     private int birdIndex = 0;
 
     private List<Pig> pigs;
@@ -411,7 +412,7 @@ public class GameLevelThreeScreen implements Screen {
                 createBirds();
                 isLaunched = false;
             } else if (pigs.stream().allMatch(pig -> pig.isDead)) {
-                game.setScreen(new WinScreen(game, nextLevel));
+                game.setScreen(new WinScreen(game, nextLevel,score,3000));
             } else {
                 game.setScreen(new LevelFailScreen(game));
             }

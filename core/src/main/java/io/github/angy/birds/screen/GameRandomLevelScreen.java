@@ -50,6 +50,7 @@ public class GameRandomLevelScreen implements Screen {
     private List<Vector2> trajectoryPoints;
 
     private AngryBird[] birdForLevel;
+    public int score;
     private int birdIndex = 0;
 
     // Add a list to store pigs

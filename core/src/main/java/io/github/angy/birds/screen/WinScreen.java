@@ -26,11 +26,15 @@ public class WinScreen implements Screen {
     private Image nextLevelImage;
     private Image ReseartLevelImage;
     private Image MainMenuImage;
+    private int score;
+    private int maxScore;
 
-    public WinScreen(final AngryBirdsGame game, Screen nextScreen) {
+    public WinScreen(final AngryBirdsGame game, Screen nextScreen, int score, int maxScore) {
         this.game = game;
         this.lastScreen = game.getScreen();
         this.nextScreen = nextScreen;
+        this.score = score;
+        this.maxScore = maxScore;
         stage = new Stage(new FitViewport(1920, 1080));
         Gdx.input.setInputProcessor(stage);
 
@@ -91,15 +95,28 @@ public class WinScreen implements Screen {
         Texture oneStarTexture = new Texture(Gdx.files.internal("ui/1stars.png"));
         Texture twoStarTexture = new Texture(Gdx.files.internal("ui/2stars.png"));
         Texture threeStarTexture = new Texture(Gdx.files.internal("ui/3stars.png"));
-
-        starsImage.addAction(Actions.sequence(
+        if(score <= maxScore / 3) {
+            starsImage.addAction(Actions.sequence(
             Actions.delay(0.3f),
-            Actions.run(() -> starsImage.setDrawable(new TextureRegionDrawable(oneStarTexture))),
-            Actions.delay(0.3f),
-            Actions.run(() -> starsImage.setDrawable(new TextureRegionDrawable(twoStarTexture))),
-            Actions.delay(0.3f),
-            Actions.run(() -> starsImage.setDrawable(new TextureRegionDrawable(threeStarTexture)))
-        ));
+            Actions.run(() -> starsImage.setDrawable(new TextureRegionDrawable(oneStarTexture))
+        )));
+        } else if(score <= 2 * maxScore / 3) {
+            starsImage.addAction(Actions.sequence(
+                Actions.delay(0.3f),
+                Actions.run(() -> starsImage.setDrawable(new TextureRegionDrawable(oneStarTexture))),
+                Actions.delay(0.3f),
+                Actions.run(() -> starsImage.setDrawable(new TextureRegionDrawable(twoStarTexture)))
+                ));
+        } else {
+            starsImage.addAction(Actions.sequence(
+                Actions.delay(0.3f),
+                Actions.run(() -> starsImage.setDrawable(new TextureRegionDrawable(oneStarTexture))),
+                Actions.delay(0.3f),
+                Actions.run(() -> starsImage.setDrawable(new TextureRegionDrawable(twoStarTexture))),
+                Actions.delay(0.3f),
+                Actions.run(() -> starsImage.setDrawable(new TextureRegionDrawable(threeStarTexture)))
+                ));
+        }
     }
 
     @Override
