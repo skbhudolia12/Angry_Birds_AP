@@ -89,7 +89,7 @@ public class LevelSelectionScreen implements Screen {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 gameSound.stopLevelSelectionSound();
-                game.setScreen(new GameRandomLevelScreen(game));
+                game.setScreen(new GameLevelTwoScreen(game));
                 return true;
             }
         });

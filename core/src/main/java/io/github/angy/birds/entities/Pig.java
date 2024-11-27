@@ -28,7 +28,7 @@ public class Pig {
 
     private static final int DEFAULT_LIFE = 1;
     private static final float DEFAULT_RADIUS = 0.3f;
-    private static final float DEFAULT_DENSITY = 5f;
+    private static final float DEFAULT_DENSITY = 2f;
 
     public Pig(float x, float y, World world, String type) {
         this.type = type;
@@ -37,7 +37,6 @@ public class Pig {
     }
 
     private void identify(String type) {
-        // Adjust pig properties based on type (if needed)
         switch (type) {
             case "small":
                 texture = new Texture("ui/pigs/normalpig.png");
@@ -48,16 +47,16 @@ public class Pig {
                 break;
             case "large":
                 texture = new Texture("ui/pigs/helmetpig.png");
-                radius = DEFAULT_RADIUS * 1.5f;
-                life = 2;
-                maxLife = life;
-                density = DEFAULT_DENSITY * 1.5f;
+                radius = DEFAULT_RADIUS ;
+                life = 200;
+                maxLife = 200;
+                density = DEFAULT_DENSITY ;
                 break;
             case "king":
                 texture = new Texture("ui/pigs/kingpig.png");
                 radius = DEFAULT_RADIUS;
-                life = 3;
-                maxLife = life;
+                life = 300;
+                maxLife = 300;
                 density = DEFAULT_DENSITY;
         }
         region = new TextureRegion(texture);
@@ -77,8 +76,8 @@ public class Pig {
         fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = density;
-        fixtureDef.friction = 0.6f;
-        fixtureDef.restitution = 0.2f; // Less bouncy for pigs
+        fixtureDef.friction = 10f;
+        fixtureDef.restitution = 0f; // Less bouncy for pigs
         body.setUserData(this);
         body.createFixture(fixtureDef);
         shape.dispose();

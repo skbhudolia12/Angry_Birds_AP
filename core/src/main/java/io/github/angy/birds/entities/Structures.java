@@ -51,49 +51,49 @@ public class Structures {
                 texture = new Texture("ui/Angry Birds2.0/woodcone1.png");
                 width = 0.5f;
                 height = 1f;
-                durability = 1;
+                durability = 100;
                 break;
 
             case "glassblock1":
                 texture = new Texture("ui/Angry Birds2.0/glassblock1.png");
                 width = 0.75f;
                 height = 0.75f;
-                durability = 15;
+                durability = 200;
                 break;
 
             case "glassblock2":
                 texture = new Texture("ui/Angry Birds2.0/glassblock2.png");
                 width = 0.75f;
                 height = 0.75f;
-                durability = 20;
+                durability = 200;
                 break;
 
             case "glasscone1":
                 texture = new Texture("ui/Angry Birds2.0/glasscone1.png");
                 width = 1f;
                 height = 1f;
-                durability = 18;
+                durability = 150;
                 break;
 
             case "metalblock1":
                 texture = new Texture("ui/Angry Birds2.0/metalblock1.png");
                 width = 0.75f;
                 height = 0.75f;
-                durability = 50;
+                durability = 300;
                 break;
 
             case "metalblock2":
                 texture = new Texture("ui/Angry Birds2.0/metalblock2.png");
                 width = 0.75f;
                 height = 0.75f;
-                durability = 60;
+                durability = 300;
                 break;
 
             case "metalcone1":
                 texture = new Texture("ui/Angry Birds2.0/metalcone1.png");
                 width = 0.5f;
                 height = 1f;
-                durability = 55;
+                durability = 300;
                 break;
 
             default:

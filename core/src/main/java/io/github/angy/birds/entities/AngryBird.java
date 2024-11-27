@@ -74,6 +74,33 @@ public class AngryBird extends Actor {
                 radius = YELLOWRADIUS;
                 maxPower = MAXYELLOW;
                 break;
+            case "green":
+                texture = new Texture("ui/angry birds/greenbird.png");
+                region = new TextureRegion(texture);
+                life = 1;
+                maxLife = 2;
+                density = YELLOWDENS;
+                radius = YELLOWRADIUS;
+                maxPower = MAXYELLOW;
+                break;
+            case "black":
+                texture = new Texture("ui/angry birds/blackbird.png");
+                region = new TextureRegion(texture);
+                life = 1;
+                maxLife = 2;
+                density = YELLOWDENS;
+                radius = YELLOWRADIUS;
+                maxPower = MAXYELLOW;
+                break;
+            case "blue":
+                texture = new Texture("ui/angry birds/bluebird.png");
+                region = new TextureRegion(texture);
+                life = 1;
+                maxLife = 2;
+                density = YELLOWDENS;
+                radius = YELLOWRADIUS;
+                maxPower = MAXYELLOW;
+                break;
         }
     }
 
