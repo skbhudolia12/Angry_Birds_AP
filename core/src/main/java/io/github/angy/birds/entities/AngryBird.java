@@ -58,8 +58,8 @@ public class AngryBird extends Actor {
             case "red":
                 texture = new Texture("ui/angry birds/redbird.png");
                 region = new TextureRegion(texture);
-                life = REDLIFE;
-                maxLife = REDLIFE;
+                life = 1;
+                maxLife = 2;
                 density = REDDENS;
                 radius = REDRADIUS;
                 maxPower = MAXRED;
@@ -67,8 +67,8 @@ public class AngryBird extends Actor {
             case "yellow":
                 texture = new Texture("ui/angry birds/yellowbird.png");
                 region = new TextureRegion(texture);
-                life = YELLOWLIFE;
-                maxLife = YELLOWLIFE;
+                life = 1;
+                maxLife = 2;
                 density = YELLOWDENS;
                 radius = YELLOWRADIUS;
                 maxPower = MAXYELLOW;
@@ -174,7 +174,6 @@ public class AngryBird extends Actor {
     }
 
     public void dispose() {
-        body.getWorld().destroyBody(body);
         texture.dispose();
     }
     public int getDamage(){

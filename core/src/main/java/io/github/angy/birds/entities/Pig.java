@@ -154,7 +154,6 @@ public class Pig {
     }
 
     public void dispose() {
-        body.getWorld().destroyBody(body);
         texture.dispose();
     }
 }
