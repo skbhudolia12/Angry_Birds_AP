@@ -47,11 +47,6 @@ public class GameScreen implements Screen {
         }
 
 
-        if (gamePaused) {
-            game.setScreen(new PauseScreen(game));
-            return;
-        }
-
         // Game logic to check if the level is complete (this is a placeholder logic)
         checkLevelCompletion();
 

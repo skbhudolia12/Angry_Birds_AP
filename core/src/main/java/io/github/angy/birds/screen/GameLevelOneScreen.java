@@ -1,6 +1,7 @@
     package io.github.angy.birds.screen;
 
     import com.badlogic.gdx.Gdx;
+    import com.badlogic.gdx.Input;
     import com.badlogic.gdx.InputAdapter;
     import com.badlogic.gdx.Screen;
     import com.badlogic.gdx.graphics.Color;
@@ -39,6 +40,7 @@
         private Texture slingshotTexture;
         private Texture backgroundTexture;
 
+        private boolean paused = false;
         private boolean isDragging = false;
         private boolean isLaunched = false;
         private Vector2 slingStart, slingEnd;
@@ -256,6 +258,16 @@
             private static final float MAX_PULL_DISTANCE = 1f; // Set maximum pull distance in world units
 
             @Override
+            public boolean keyDown(int keycode) {
+                if (keycode == Input.Keys.P) {
+                    game.setScreen(new PauseScreen(game, (Screen) GameLevelOneScreen.this , (Class<? extends Screen>) this.getClass()));
+                    paused = PauseScreen.pause;
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
                 Vector3 touchPoint = new Vector3(screenX, screenY, 0);
                 camera.unproject(touchPoint);
@@ -312,7 +324,7 @@
             Vector2 startPosition = new Vector2(slingStart.x, slingStart.y);
 
             // Calculate the initial velocity based on the pull force
-            Vector2 initialVelocity = new Vector2(slingStart).sub(slingEnd).scl(10); // Adjust scaling factor as needed
+            Vector2 initialVelocity = new Vector2(slingStart).sub(slingEnd).scl(12); // Adjust scaling factor as needed
 
             // Copy the start position and velocity to simulate the trajectory
             Vector2 tempPosition = new Vector2(startPosition);
@@ -352,21 +364,6 @@
             shapeRenderer.end();
         }
 
-        private void checkWinOrLose() {
-            // Check for lose condition: no more birds
-            if (birdIndex >= birdForLevel.length) {
-                game.setScreen(new LevelFailScreen(game));
-                return;
-            }
-
-            // Check for win condition: all pigs are dead and no objects are moving
-            boolean allPigsDead = pigs.stream().allMatch(pig -> pig.isDead);
-            boolean noObjectsMoving = pigs.stream().noneMatch(Pig::isMoving) && structures.stream().noneMatch(Structures::isMoving);
-
-            if (allPigsDead && noObjectsMoving) {
-                game.setScreen(new WinScreen(game, nextLevel));
-            }
-        }
 
         @Override
         public void resize(int width, int height) {
@@ -390,8 +387,12 @@
         @Override
         public void hide() {
         }
+
     @Override
     public void render(float delta) {
+            if(paused){
+             return;
+            }
         Gdx.gl.glClearColor(0.5f , 0.7f , 1f , 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -416,7 +417,7 @@
             } else if (pigs.stream().allMatch(pig -> pig.isDead)) {
                 game.setScreen(new WinScreen(game , nextLevel));
             } else {
-                game.setScreen(new PauseScreen(game));
+                game.setScreen(new LevelFailScreen(game));
             }
         }
 
@@ -437,7 +438,6 @@
         if (isDragging) {
             drawTrajectory();
         }
-
         debugRenderer.render(world , camera.combined);
     }
 

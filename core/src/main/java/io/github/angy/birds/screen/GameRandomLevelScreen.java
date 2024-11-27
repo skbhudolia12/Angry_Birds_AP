@@ -2,6 +2,7 @@ package io.github.angy.birds.screen;
 
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -42,6 +43,7 @@ public class GameRandomLevelScreen implements Screen {
     private Texture backgroundTexture;
 
     private boolean isDragging = false;
+    private boolean paused = false;
     private boolean isLaunched = false;
     private Vector2 slingStart, slingEnd;
     private ShapeRenderer shapeRenderer;
@@ -358,6 +360,16 @@ public class GameRandomLevelScreen implements Screen {
             }
             return false;
         }
+
+        @Override
+        public boolean keyDown(int keycode) {
+            if (keycode == Input.Keys.P) {
+                game.setScreen(new PauseScreen(game, (Screen) GameRandomLevelScreen.this , (Class<? extends Screen>) this.getClass()));
+                paused = PauseScreen.pause;
+                return true;
+            }
+            return false;
+        }
     }
 
     private void calculateTrajectory() {
@@ -471,7 +483,7 @@ public class GameRandomLevelScreen implements Screen {
             } else if (pigs.stream().allMatch(pig -> pig.isDead)) {
                 game.setScreen(new MainMenu(game));
             } else {
-                game.setScreen(new PauseScreen(game));
+                game.setScreen(new LevelFailScreen(game));
             }
         }
 

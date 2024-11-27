@@ -1,6 +1,7 @@
 package io.github.angy.birds.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -39,6 +40,7 @@ public class GameLevelTwoScreen implements Screen {
 
     private boolean isDragging = false;
     private boolean isLaunched = false;
+    private boolean paused = false;
     private Vector2 slingStart, slingEnd;
     private ShapeRenderer shapeRenderer;
     private List<Vector2> trajectoryPoints;
@@ -303,6 +305,16 @@ public class GameLevelTwoScreen implements Screen {
             }
             return false;
         }
+
+        @Override
+        public boolean keyDown(int keycode) {
+            if (keycode == Input.Keys.P) {
+                game.setScreen(new PauseScreen(game, (Screen) GameLevelTwoScreen.this , (Class<? extends Screen>) this.getClass()));
+                paused = PauseScreen.pause;
+                return true;
+            }
+            return false;
+        }
     }
 
     private void calculateTrajectory() {
@@ -389,7 +401,7 @@ public class GameLevelTwoScreen implements Screen {
             } else if (pigs.stream().allMatch(pig -> pig.isDead)) {
                 game.setScreen(new WinScreen(game , nextLevel));
             } else {
-                game.setScreen(new PauseScreen(game));
+                game.setScreen(new LevelFailScreen(game));
             }
         }
 

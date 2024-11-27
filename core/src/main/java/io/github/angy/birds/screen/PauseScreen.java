@@ -17,7 +17,10 @@ import io.github.angy.birds.AngryBirdsGame;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class PauseScreen implements Screen {
+    public static boolean pause = true;
     private final AngryBirdsGame game;
     private Screen lastScreen;
     private Stage stage;
@@ -26,10 +29,12 @@ public class PauseScreen implements Screen {
     private Image returnHomeButton;
     private Image restartButton;
     private Image backgroundImage;
+    private Class<? extends Screen> currentLevelClass;
 
-    public PauseScreen(final AngryBirdsGame game) {
+    public PauseScreen(final AngryBirdsGame game, Screen lastScreen, Class<? extends Screen> currentLevelClass) {
         this.game = game;
-        this.lastScreen = game.getScreen();
+        this.lastScreen = lastScreen;
+        this.currentLevelClass = currentLevelClass;
         stage = new Stage(new FitViewport(1920, 1080));
         Gdx.input.setInputProcessor(stage);
 
@@ -64,6 +69,7 @@ public class PauseScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 game.setScreen(lastScreen);
+                pause = false;
             }
         });
 
@@ -71,13 +77,21 @@ public class PauseScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 game.setScreen(new LevelSelectionScreen(game));
+                pause = false;
             }
         });
 
         restartButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(lastScreen);
+                try {
+                game.setScreen(currentLevelClass.getConstructor(AngryBirdsGame.class).newInstance(game));
+                    pause = false;
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                } catch (NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
     }

@@ -192,11 +192,6 @@ public class MainMenu implements Screen {
         stage.addActor(exitButton);
         skin.add("exit", exitButton);
 
-        if(Gdx.input.isKeyPressed(Input.Keys.P)){
-            game.setScreen(new PauseScreen(game));
-        }
-
-
     }
 
     @Override
