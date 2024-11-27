@@ -175,6 +175,7 @@ public class AngryBird extends Actor {
 
     public void dispose() {
         texture.dispose();
+        body.getWorld().destroyBody(body);
     }
     public int getDamage(){
         return (int)maxPower;

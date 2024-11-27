@@ -23,7 +23,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class GameLevelOneScreen implements Screen {
     private final AngryBirdsGame game;
@@ -51,7 +50,6 @@ public class GameLevelOneScreen implements Screen {
     // Add a list to store pigs
     private List<Pig> pigs;
     private List<Structures> structures;
-    private ArrayList<Body> bodiesToDestroy = new ArrayList<>();
 
 
     public GameLevelOneScreen(AngryBirdsGame game) {
@@ -65,7 +63,6 @@ public class GameLevelOneScreen implements Screen {
 
         // Box2D setup
         world = new World(new Vector2(0, -9.8f), true); // Gravity
-        world.setContactListener(new CollisionHandler());
         debugRenderer = new Box2DDebugRenderer();
 
         // Load textures
@@ -151,21 +148,23 @@ public class GameLevelOneScreen implements Screen {
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
+
         // Draw background, slingshot, and bird
         batch.begin();
         batch.draw(backgroundTexture, 0, 0, 16, 9); // Full screen background
         batch.draw(slingshotTexture, 1.8f, 1.3f, 0.5f, 1);
         curBird.draw(batch); // Draw bird
-
-        if (isLaunched && !curBird.isMoving()) {
+        if(isLaunched && !curBird.isMoving()) {
             birdIndex++;
             if (birdForLevel.length > birdIndex) {
                 curBird.dispose();
                 createBirds();
                 isLaunched = false;
-            } else if (pigs.stream().allMatch(pig -> pig.isDead)) {
-                game.setScreen(new WinScreen(game, nextLevel));
-            } else {
+            }
+            else if (pigs.stream().allMatch(pig -> pig.isDead)) {
+                game.setScreen(new WinScreen(game,nextLevel));
+            }
+            else {
                 game.setScreen(new PauseScreen(game));
             }
         }
@@ -177,13 +176,11 @@ public class GameLevelOneScreen implements Screen {
             }
         }
 
-        // Draw structures
-        for (Structures structure : structures) {
-            if (!structure.isDestroyed()) {
+        for(Structures structure : structures) {
+            if(!structure.isDestroyed()) {
                 structure.draw(batch);
             }
         }
-
         batch.end();
 
         if (isDragging) {
@@ -193,145 +190,97 @@ public class GameLevelOneScreen implements Screen {
         debugRenderer.render(world, camera.combined);
     }
 
-    public void update(float deltaTime) {
-        // Perform the physics step
-        world.step(1 / 120f, 6, 2);
-
-        // Destroy bodies after the physics step
-        for (Body body : bodiesToDestroy) {
-            if (body != null) {
-                while (body.getFixtureList().size > 0) {
-                    body.destroyFixture(body.getFixtureList().get(0));
-                }
-                world.destroyBody(body);
-            }
-        }
-        bodiesToDestroy.clear(); // Clear the list for the next frame
+    private boolean isInstance(Fixture fixture, Class<?> clazz) {
+        return fixture.getUserData() != null && clazz.isInstance(fixture.getUserData());
     }
 
+    private <T> T getCollisionEntity(Fixture fixtureA, Fixture fixtureB, Class<T> clazz) {
+        if (isInstance(fixtureA, clazz)) return clazz.cast(fixtureA.getUserData());
+        if (isInstance(fixtureB, clazz)) return clazz.cast(fixtureB.getUserData());
+        return null;
+    }
 
-    public class CollisionHandler implements ContactListener {
+    private void handleCollision(Contact contact) {
+        Fixture fixtureA = contact.getFixtureA();
+        Fixture fixtureB = contact.getFixtureB();
 
-        @Override
-        public void beginContact(Contact contact) {
-            Object userDataA = contact.getFixtureA().getBody().getUserData();
-            Object userDataB = contact.getFixtureB().getBody().getUserData();
-
-            if (userDataA instanceof Pig && userDataB instanceof Pig) {
-                handlePigHitsPig((Pig) userDataA, (Pig) userDataB);
-            } else if (userDataA instanceof Structures && userDataB instanceof Structures) {
-                handleStructureHitsStructure((Structures) userDataA, (Structures) userDataB);
-            } else if (userDataA instanceof AngryBird && userDataB instanceof Pig) {
-                handleBirdHitsPig((AngryBird) userDataA, (Pig) userDataB);
-            } else if (userDataA instanceof Pig && userDataB instanceof AngryBird) {
-                handleBirdHitsPig((AngryBird) userDataB, (Pig) userDataA);
-            } else if (userDataA instanceof AngryBird && userDataB instanceof Structures) {
-                handleBirdHitsStructure((AngryBird) userDataA, (Structures) userDataB);
-            } else if (userDataA instanceof Structures && userDataB instanceof AngryBird) {
-                handleBirdHitsStructure((AngryBird) userDataB, (Structures) userDataA);
-            } else if (userDataA instanceof Pig && userDataB instanceof Structures) {
-                handlePigHitsStructure((Pig) userDataA, (Structures) userDataB);
-            } else if (userDataA instanceof Structures && userDataB instanceof Pig) {
-                handlePigHitsStructure((Pig) userDataB, (Structures) userDataA);
-            }
+        // Handle bird collision
+        AngryBird bird = getCollisionEntity(fixtureA, fixtureB, AngryBird.class);
+        if (bird != null) {
+            handleBirdCollision(bird, fixtureA, fixtureB, contact);
         }
 
+        // Handle pig collision
+        Pig pig = getCollisionEntity(fixtureA, fixtureB, Pig.class);
+        if (pig != null) {
+            handlePigCollision(pig, fixtureA, fixtureB, contact);
+        }
+
+        // Handle structure collision
+        Structures structure = getCollisionEntity(fixtureA, fixtureB, Structures.class);
+        if (structure != null) {
+            handleStructureCollision(structure, fixtureA, fixtureB, contact);
+        }
+    }
+
+    private void handleBirdCollision(AngryBird bird, Fixture fixtureA, Fixture fixtureB, Contact contact) {
+        Vector2 point = contact.getWorldManifold().getPoints()[0];
+        float distance = point.dst(bird.getBody().getPosition());
+        Vector2 relativeVelocity = fixtureA.getBody().getLinearVelocity().sub(fixtureB.getBody().getLinearVelocity());
+        int damage = bird.calculateDamage(distance, relativeVelocity.len());
+        bird.onHit(damage);
+
+        if (bird.isDead) {
+        }
+    }
+
+    private void handlePigCollision(Pig pig, Fixture fixtureA, Fixture fixtureB, Contact contact) {
+        Vector2 relativeVelocity = fixtureA.getBody().getLinearVelocity().sub(fixtureB.getBody().getLinearVelocity());
+        int damage = (int) relativeVelocity.len() * 10;
+        pig.onHit(damage);
+        System.out.println(pig.getLife());
+
+        if (pig.isDead) {
+            pig.dispose();
+        }
+    }
+
+    private void handleStructureCollision(Structures structure, Fixture fixtureA, Fixture fixtureB, Contact contact) {
+        Vector2 relativeVelocity = fixtureA.getBody().getLinearVelocity().sub(fixtureB.getBody().getLinearVelocity());
+        int damage = (int) relativeVelocity.len() * 10;
+        structure.takeDamage(damage);
+        try (FileWriter writer = new FileWriter("structure_details.txt", true)) {
+            writer.write("Durability: " + structure.durability + "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        };
+
+        if (structure.isDestroyed()) {
+            structure.dispose();
+        }
+    }
+
+    private class GameContactListener implements ContactListener {
+        @Override
+        public void beginContact(Contact contact) {
+            handleCollision(contact);
+        }
 
         @Override
         public void endContact(Contact contact) {
-            Object userDataA = contact.getFixtureA().getBody().getUserData();
-            Object userDataB = contact.getFixtureB().getBody().getUserData();
-
-            // Handle entity A
-            if (userDataA instanceof Pig && ((Pig) userDataA).isDead) {
-                makeBodyContactless(contact.getFixtureA().getBody());
-                ((Pig) userDataA).dispose();
-            } else if (userDataA instanceof AngryBird && ((AngryBird) userDataA).getLife() <= 0) {
-                makeBodyContactless(contact.getFixtureA().getBody());
-//            ((AngryBird) userDataA).dispose();
-            } else if (userDataA instanceof Structures && ((Structures) userDataA).isDestroyed()) {
-                makeBodyContactless(contact.getFixtureA().getBody());
-                ((Structures) userDataA).dispose();
-            }
-
-            // Handle entity B
-            if (userDataB instanceof Pig && ((Pig) userDataB).isDead) {
-                makeBodyContactless(contact.getFixtureB().getBody());
-                ((Pig) userDataB).dispose();
-            } else if (userDataB instanceof AngryBird && ((AngryBird) userDataB).getLife() <= 0) {
-                makeBodyContactless(contact.getFixtureB().getBody());
-//            ((AngryBird) userDataB).dispose();
-            } else if (userDataB instanceof Structures && ((Structures) userDataB).isDestroyed()) {
-                makeBodyContactless(contact.getFixtureB().getBody());
-                ((Structures) userDataB).dispose();
-            }
-        }
-
-        private void makeBodyContactless(Body body) {
-            if (!bodiesToDestroy.contains(body)) {
-                bodiesToDestroy.add(body);
-            }
-        }
-
-
-
-        @Override
-        public void preSolve(Contact contact, Manifold oldManifold) {
-            // Adjust collision properties before resolution if needed
+            // Handle end contact events if necessary
         }
 
         @Override
-        public void postSolve(Contact contact, ContactImpulse impulse) {
-            // Handle impulse-based events after collision
+        public void preSolve(Contact contact, Manifold manifold) {
+            // Optional: Use for advanced collision handling
         }
 
-        private void handleBirdHitsPig(AngryBird bird, Pig pig) {
-            float relativeSpeed = bird.getBody().getLinearVelocity().len();
-            if(Objects.equals(bird.getType(), "red") || Objects.equals(bird.getType(), "yellow")){
-                pig.onHit(1);
-            }
-            bird.setLife(0);
-        }
-
-        private void handlePigHitsPig(Pig pig1, Pig pig2) {
-            float impactSpeed = pig1.getBody().getLinearVelocity().sub(pig2.getBody().getLinearVelocity()).len();
-            int damage = (int) (impactSpeed * pig1.getRadius() * 0.5); // Adjust multiplier for damage calculation
-            pig1.onHit(1);
-            pig2.onHit(1);
-
-        }
-
-        private void handleStructureHitsStructure(Structures structure1, Structures structure2) {
-            float impactSpeed = structure1.getBody().getLinearVelocity().sub(structure2.getBody().getLinearVelocity()).len();
-            int damage = (int) (impactSpeed * 5); // Adjust multiplier for damage calculation
-
-            structure1.takeDamage(1);
-            structure2.takeDamage(1);
-
-        }
-
-
-        private void handleBirdHitsStructure(AngryBird bird, Structures structure) {
-            float relativeSpeed = bird.getBody().getLinearVelocity().len();
-            if(Objects.equals(bird.getType(), "red") || Objects.equals(bird.getType(), "yellow")){
-                structure.takeDamage(1);
-            }
-            bird.setLife(0);
-
-        }
-
-        private void handlePigHitsStructure(Pig pig, Structures structure) {
-
-            float impactSpeed = pig.getBody().getLinearVelocity().len();
-            int pigDamage = (int) (impactSpeed * pig.getRadius());
-            int structureDamage = (int) (impactSpeed * structure.getBoundingRectangle().area());
-
-            pig.onHit(1);
-            structure.takeDamage(1);
-
+        @Override
+        public void postSolve(Contact contact, ContactImpulse contactImpulse) {
+            // Optional: Use for advanced collision handling
         }
     }
-
 
     private class GameInputAdapter extends InputAdapter {
         private static final float MAX_PULL_DISTANCE = 1f; // Set maximum pull distance in world units
@@ -403,7 +352,7 @@ public class GameLevelOneScreen implements Screen {
         float timeStep = 1 / 120f;
 
         // Simulate trajectory points
-        for (int i = 0; i < 180; i++) { // Adjust the number of points as needed
+        for (int i = 0; i < 120; i++) { // Adjust the number of points as needed
             // Update velocity due to gravity
             tempVelocity.y += world.getGravity().y * timeStep;
 
@@ -457,7 +406,7 @@ public class GameLevelOneScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(new GameInputAdapter());
-        world.setContactListener(new CollisionHandler());
+        world.setContactListener(new GameContactListener());
     }
 
     @Override
