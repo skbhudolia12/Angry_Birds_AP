@@ -135,9 +135,9 @@ public class AngryBird extends Actor {
 
     private void updateTexture() {
         if (life <= maxLife / 2) {
-            if (texture != null) {
-                texture.dispose();
-            }
+            //if (texture != null) {
+              //  texture.dispose();
+            //}
 
             switch (type) {
                 case "red":
