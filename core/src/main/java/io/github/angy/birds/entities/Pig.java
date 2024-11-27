@@ -152,4 +152,9 @@ public class Pig {
     public void setDead (boolean b) {
         isDead = b;
     }
+
+    public void dispose() {
+        body.getWorld().destroyBody(body);
+        texture.dispose();
+    }
 }

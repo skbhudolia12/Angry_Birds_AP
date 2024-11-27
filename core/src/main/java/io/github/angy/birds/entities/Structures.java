@@ -147,7 +147,7 @@ public class Structures {
         durability -= damage;
         if (durability <= 0) {
             isDestroyed = true;
-
+            dispose();
         }
     }
 
@@ -174,5 +174,10 @@ public class Structures {
 
     public boolean isMoving () {
         return body.getLinearVelocity().len() > 0.1f;
+    }
+
+    public void dispose() {
+        body.getWorld().destroyBody(body);
+        texture.dispose();
     }
 }
