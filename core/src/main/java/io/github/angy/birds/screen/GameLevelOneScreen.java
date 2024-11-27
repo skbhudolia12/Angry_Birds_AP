@@ -92,15 +92,12 @@ public class GameLevelOneScreen implements Screen {
 
     private void createPigs() {
         pigs = new ArrayList<>();
-
-        // Add pigs with positions and types
         pigs.add(new Pig(10, 2, world, "small"));
+
     }
 
     private void createStructures() {
         structures = new ArrayList<>();
-
-        // Add two woodblock1
         structures.add(new Structures(10, 1.5f, 1f, 0.5f, world, "woodblock1", 20));
     }
 
@@ -230,7 +227,7 @@ public class GameLevelOneScreen implements Screen {
         private void handlePigCollision(Body pigBody) {
             Pig pig = (Pig) pigBody.getUserData();
             int impactForce = 15; // Simulated impact force
-            pig.onHit(impactForce * 10);
+            pig.onHit(impactForce);
             if (pig.isDead()) {
                 System.out.println("Pig destroyed! Queuing for destruction.");
                 pigBody.setUserData(null);
@@ -241,7 +238,7 @@ public class GameLevelOneScreen implements Screen {
         private void handleMaterialCollision(Body materialBody) {
             Structures structure = (Structures) materialBody.getUserData();
             int impactForce = 15; // Simulated impact force
-            structure.takeDamage(impactForce * 5);
+            structure.takeDamage(impactForce);
             if (structure.isDestroyed()) {
                 System.out.println("Material destroyed! Queuing for destruction.");
                 materialBody.setUserData(null);
@@ -390,18 +387,17 @@ public class GameLevelOneScreen implements Screen {
     }
 @Override
 public void render(float delta) {
-    // Clear screen
     Gdx.gl.glClearColor(0.5f , 0.7f , 1f , 1);
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-    world.step(1 / 120f , 6 , 2);
+    world.step(1 / 60f , 6 , 2);
     camera.update();
     batch.setProjectionMatrix(camera.combined);
     for (Body body : bodiestoDestroy) {
         world.destroyBody(body);
     }
     bodiestoDestroy.clear();
-    // Draw background, slingshot, and bird
+
     batch.begin();
     batch.draw(backgroundTexture , 0 , 0 , 16 , 9); // Full screen background
     batch.draw(slingshotTexture , 1.8f , 1.3f , 0.5f , 1);
@@ -449,7 +445,6 @@ public void render(float delta) {
         curBird.dispose();
         shapeRenderer.dispose();
 
-        // Dispose pigs
         for (Pig pig : pigs) {
             pig.dispose();
         }

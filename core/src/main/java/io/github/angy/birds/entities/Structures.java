@@ -37,14 +37,14 @@ public class Structures {
                 texture = new Texture("ui/Angry Birds2.0/woodblock1.png");
                 width = 0.75f;
                 height = 0.75f;
-                durability = 1;
+                durability = 100;
                 break;
 
             case "woodblock2":
                 texture = new Texture("ui/Angry Birds2.0/woodblock2.png");
                 width = 0.75f;
                 height = 0.75f;
-                durability = 1;
+                durability = 100;
                 break;
 
             case "woodcone1":
