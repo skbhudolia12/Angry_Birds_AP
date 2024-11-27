@@ -96,29 +96,29 @@ public class LevelSelectionScreen implements Screen {
         stage.addActor(level2Button);
         skin.add("level2", level2Button);
 
-//        level3Button = new Image(new Texture(Gdx.files.internal("ui/level3Button.png")));
-//        level3Button.setSize(80, 100);
-//        level3Button.setPosition(650, 100);
-//        level3Button.addListener(new InputListener() {
-//            @Override
-//            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-//                level3Button.addAction(Actions.scaleTo(1.1f, 1.1f, 0.2f));
-//            }
-//
-//            @Override
-//            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-//                level3Button.addAction(Actions.scaleTo(1.0f, 1.0f, 0.2f));
-//            }
-//
-//            @Override
-//            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-//                gameSound.stopLevelSelectionSound();
-//                game.setScreen(new GameLevelThreeScreen(game));
-//                return true;
-//            }
-//        });
-//        stage.addActor(level3Button);
-//        skin.add("level3", level3Button);
+        level3Button = new Image(new Texture(Gdx.files.internal("ui/level3Button.png")));
+        level3Button.setSize(80, 100);
+        level3Button.setPosition(650, 100);
+        level3Button.addListener(new InputListener() {
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                level3Button.addAction(Actions.scaleTo(1.1f, 1.1f, 0.2f));
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                level3Button.addAction(Actions.scaleTo(1.0f, 1.0f, 0.2f));
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                gameSound.stopLevelSelectionSound();
+                game.setScreen(new GameLevelThreeScreen(game));
+                return true;
+            }
+        });
+        stage.addActor(level3Button);
+        skin.add("level3", level3Button);
 
         ReturnButton = new Image(new Texture(Gdx.files.internal("ui/returnButton.png")));
         ReturnButton.setSize(80, 100);
