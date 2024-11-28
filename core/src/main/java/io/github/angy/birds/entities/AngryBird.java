@@ -185,7 +185,6 @@ public class AngryBird extends Actor {
         }
 
         assert texture != null;
-        region = new TextureRegion(texture);
     }
 
     public int getLife() {

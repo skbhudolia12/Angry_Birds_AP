@@ -7,7 +7,7 @@ import java.io.*;
 public class LoadSave {
 
     private static String getFileName(int levelNum) {
-        return "/home/sakie/IdeaProjects/Angy Birds/core/src/main/java/io/github/angy/birds/Data/level" + levelNum + "_progress.txt";
+        return "core/src/main/java/io/github/angy/birds/Data/level" + levelNum + "_progress.txt";
     }
 
     public static void saveProgress(int levelNum, LevelProgress progress) {

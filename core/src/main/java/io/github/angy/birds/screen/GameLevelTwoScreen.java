@@ -19,6 +19,8 @@ import io.github.angy.birds.AngryBirdsGame;
 import io.github.angy.birds.entities.AngryBird;
 import io.github.angy.birds.entities.Pig;
 import io.github.angy.birds.entities.Structures;
+import io.github.angy.birds.utils.LevelProgress;
+import io.github.angy.birds.utils.LoadSave;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +42,7 @@ public class GameLevelTwoScreen implements Screen {
 
     private boolean isDragging = false;
     private boolean isLaunched = false;
+    private boolean isCompleted = false;
     private boolean paused = false;
     private Vector2 slingStart, slingEnd;
     private ShapeRenderer shapeRenderer;
@@ -184,6 +187,7 @@ public class GameLevelTwoScreen implements Screen {
                 structure.takeDamage(structure.getDurability());
                 if (structure.isDestroyed()) {
                     System.out.println("Material destroyed! Queuing for destruction.");
+                    score+=100;
                     materialBody.setUserData(null);
                     bodiestoDestroy.add(structure.getBody());
                 }
@@ -199,6 +203,7 @@ public class GameLevelTwoScreen implements Screen {
                 bird.flagInitialContact();
                 pig.onHit(pig.getLife());
                 System.out.println("Pig destroyed! Queuing for destruction.");
+                score+=200;
                 pigBody.setUserData(null);
                 bodiestoDestroy.add(pigBody);
             }
@@ -375,6 +380,17 @@ public class GameLevelTwoScreen implements Screen {
         Gdx.input.setInputProcessor(new GameInputAdapter());
         world.setContactListener(new GameContactListener());
     }
+    public void saveGameProgress() {
+        LevelProgress progress = new LevelProgress(score, isCompleted);
+        LoadSave.saveProgress(2, progress);
+    }
+
+    public void loadGameProgress() {
+        LevelProgress progress = LoadSave.loadProgress(2);
+        this.score = progress.getScore();
+        this.isCompleted = progress.isCompleted();
+    }
+
 
     @Override
     public void render(float delta) {
@@ -398,11 +414,23 @@ public class GameLevelTwoScreen implements Screen {
             if (birdForLevel.length > birdIndex) {
                 curBird.dispose();
                 createBirds();
+                System.out.println("Bird Changed. Score Right now "+ score);
                 isLaunched = false;
-            } else if (pigs.stream().allMatch(pig -> pig.isDead)) {
-                game.setScreen(new WinScreen(game , nextLevel,score,2000));
-            } else {
-                game.setScreen(new LevelFailScreen(game));
+            }
+            else {
+                if (score < 300) {
+                    game.setScreen(new LevelFailScreen(game));
+                    saveGameProgress();
+                } else if (pigs.stream().allMatch(Pig::isDead)) {
+                    score = score + 1500;
+                    game.setScreen(new WinScreen(game , nextLevel , score , 2000));
+                    isCompleted = true;
+                    saveGameProgress();
+                } else {
+                    game.setScreen(new WinScreen(game , nextLevel , score , 2000));
+                    isCompleted = true;
+                    saveGameProgress();
+                }
             }
         }
 
@@ -447,6 +475,7 @@ public class GameLevelTwoScreen implements Screen {
 
     @Override
     public void pause() {
+        saveGameProgress();
     }
 
     @Override

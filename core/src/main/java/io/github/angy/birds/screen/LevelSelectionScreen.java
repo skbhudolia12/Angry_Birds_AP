@@ -100,6 +100,26 @@ public class LevelSelectionScreen implements Screen {
         level2Button = new Image(new Texture(Gdx.files.internal("ui/level2Button.png")));
         level2Button.setSize(80, 100);
         level2Button.setPosition(580, 200);
+        progress =  loadProgress(2);
+        score = progress.getScore();
+        completed = progress.isCompleted();
+        if(completed){
+            if(score<=500){
+                level2Button = new Image(new Texture(Gdx.files.internal("ui/level2complete_1star.png")));
+                level2Button.setSize(80, 100);
+                level2Button.setPosition(580, 200);
+            } else if (score<=1000) {
+                level2Button = new Image(new Texture(Gdx.files.internal("ui/level2complete_2star.png")));
+                level2Button.setSize(80, 100);
+                level2Button.setPosition(580, 200);
+            }
+            else{
+                level2Button = new Image(new Texture(Gdx.files.internal("ui/level2complete_3star.png")));
+                level2Button.setSize(80, 100);
+                level2Button.setPosition(580, 200);
+            }
+        }
+
         level2Button.addListener(new InputListener() {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
@@ -124,6 +144,27 @@ public class LevelSelectionScreen implements Screen {
         level3Button = new Image(new Texture(Gdx.files.internal("ui/level3Button.png")));
         level3Button.setSize(80, 100);
         level3Button.setPosition(650, 100);
+        progress =  loadProgress(3);
+        score = progress.getScore();
+        completed = progress.isCompleted();
+        if(completed){
+            if(score<=500){
+                level3Button = new Image(new Texture(Gdx.files.internal("ui/level3complete_1star.png")));
+                level3Button.setSize(80, 100);
+                level3Button.setPosition(650, 100);
+            } else if (score<=1000) {
+                level3Button = new Image(new Texture(Gdx.files.internal("ui/level3complete_2star.png")));
+                level3Button.setSize(80, 100);
+                level3Button.setPosition(650, 100);
+            }
+            else{
+                level3Button = new Image(new Texture(Gdx.files.internal("ui/level3complete_3star.png")));
+                level3Button.setSize(80, 100);
+                level3Button.setPosition(650, 100);
+            }
+        }
+
+
         level3Button.addListener(new InputListener() {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {

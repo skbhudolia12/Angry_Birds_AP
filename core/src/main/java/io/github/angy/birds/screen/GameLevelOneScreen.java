@@ -434,15 +434,19 @@
                 isLaunched = false;
             }
             else {
-              if(score < 300){
-                game.setScreen(new LevelFailScreen(game));
-                saveGameProgress();
-              }
-              else{
-                game.setScreen(new WinScreen(game, nextLevel ,score,2000));
-                isCompleted = true;
-                saveGameProgress();
-              }
+                if (score < 300) {
+                    game.setScreen(new LevelFailScreen(game));
+                    saveGameProgress();
+                } else if (pigs.stream().allMatch(Pig::isDead)) {
+                    score = score + 1500;
+                    game.setScreen(new WinScreen(game , nextLevel , score , 2000));
+                    isCompleted = true;
+                    saveGameProgress();
+                } else {
+                    game.setScreen(new WinScreen(game , nextLevel , score , 2000));
+                    isCompleted = true;
+                    saveGameProgress();
+                }
             }
         }
 
