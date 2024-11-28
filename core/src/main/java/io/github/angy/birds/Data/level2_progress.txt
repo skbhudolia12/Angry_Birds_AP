@@ -1,2 +1,2 @@
-Score:500
+Score:800
 Completed:true

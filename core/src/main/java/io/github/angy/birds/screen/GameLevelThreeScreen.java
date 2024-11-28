@@ -380,11 +380,11 @@ public class GameLevelThreeScreen implements Screen {
     }
     public void saveGameProgress() {
         LevelProgress progress = new LevelProgress(score, isCompleted);
-        LoadSave.saveProgress(2, progress);
+        LoadSave.saveProgress(3, progress);
     }
 
     public void loadGameProgress() {
-        LevelProgress progress = LoadSave.loadProgress(2);
+        LevelProgress progress = LoadSave.loadProgress(3);
         this.score = progress.getScore();
         this.isCompleted = progress.isCompleted();
     }
