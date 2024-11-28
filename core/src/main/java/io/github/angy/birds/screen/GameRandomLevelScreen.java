@@ -135,19 +135,18 @@ public class GameRandomLevelScreen implements Screen {
         curBird = birdForLevel[0];
 
         // Randomly determine the type of blocks at fixed positions
-        float[][] blockPositions = {
-            {5,2},
-            {6,2},
-            {7,2},
-            {8,2},
-        };
+        float[][] blockPositions = new float[4][2];
+        for (int i = 0; i < blockPositions.length; i++) {
+            blockPositions[i][0] = 12 + random.nextInt(4); // x between 12 and 15
+            blockPositions[i][1] = 1.5f + (random.nextInt(4) * 0.5f); // y values: 1.5, 2.0, 2.5, or 3.0
+        }
 
-        float[][] pigPositions = {
-            {5,4},
-            {6,4},
-            {7,4},
-            {8,4},
-        };
+
+        float[][] pigPositions = new float[4][2];
+        for (int i = 0; i < blockPositions.length; i++) {
+            blockPositions[i][0] = 12 + random.nextInt(4); // x between 12 and 15
+            blockPositions[i][1] = 1.5f + (random.nextInt(4) * 0.5f); // y values: 1.5, 2.0, 2.5, or 3.0
+        }
 
         for (float[] position : pigPositions) {
             Pig pig = createRandomPig(position[0], position[1]);
@@ -352,7 +351,7 @@ public class GameRandomLevelScreen implements Screen {
         @Override
         public boolean touchUp(int screenX, int screenY, int pointer, int button) {
             if (isDragging) {
-                Vector2 impulse = new Vector2(slingStart).sub(slingEnd).scl(10); // Adjust force multiplier
+                Vector2 impulse = new Vector2(slingStart).sub(slingEnd).scl(12.75f); // Adjust force multiplier
                 curBird.getBody().applyLinearImpulse(impulse, curBird.getBody().getWorldCenter(), true);
                 curBird.unfreezeBird();
                 isDragging = false;
@@ -380,7 +379,7 @@ public class GameRandomLevelScreen implements Screen {
         Vector2 startPosition = new Vector2(slingStart.x, slingStart.y);
 
         // Calculate the initial velocity based on the pull force
-        Vector2 initialVelocity = new Vector2(slingStart).sub(slingEnd).scl(10); // Adjust scaling factor as needed
+        Vector2 initialVelocity = new Vector2(slingStart).sub(slingEnd).scl(12.75f); // Adjust scaling factor as needed
 
         // Copy the start position and velocity to simulate the trajectory
         Vector2 tempPosition = new Vector2(startPosition);

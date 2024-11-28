@@ -49,7 +49,7 @@
         private ShapeRenderer shapeRenderer;
         private List<Vector2> trajectoryPoints;
 
-        private String[] birdForLevel = {"red", "yellow", "green"};
+        private String[] birdForLevel = {"red", "yellow", "white"};
         public int score = 0;
         private int birdIndex = 0;
 
@@ -313,7 +313,7 @@
             @Override
             public boolean touchUp(int screenX, int screenY, int pointer, int button) {
                 if (isDragging) {
-                    Vector2 impulse = new Vector2(slingStart).sub(slingEnd).scl(10); // Adjust force multiplier
+                    Vector2 impulse = new Vector2(slingStart).sub(slingEnd).scl(12.75f); // Adjust force multiplier
                     curBird.getBody().applyLinearImpulse(impulse, curBird.getBody().getWorldCenter(), true);
                     curBird.unfreezeBird();
                     isDragging = false;
@@ -331,7 +331,7 @@
             Vector2 startPosition = new Vector2(slingStart.x, slingStart.y);
 
             // Calculate the initial velocity based on the pull force
-            Vector2 initialVelocity = new Vector2(slingStart).sub(slingEnd).scl(12); // Adjust scaling factor as needed
+            Vector2 initialVelocity = new Vector2(slingStart).sub(slingEnd).scl(12.75f); // Adjust scaling factor as needed
 
             // Copy the start position and velocity to simulate the trajectory
             Vector2 tempPosition = new Vector2(startPosition);

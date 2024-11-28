@@ -59,7 +59,7 @@ public class GameLevelThreeScreen implements Screen {
 
     public GameLevelThreeScreen(AngryBirdsGame game) {
         this.game = game;
-        this.nextLevel = null; // Replace with next level screen if applicable
+        this.nextLevel = new GameRandomLevelScreen(game); // Replace with next level screen if applicable
 
         // Setup camera and viewport
         camera = new OrthographicCamera();
@@ -113,7 +113,7 @@ public class GameLevelThreeScreen implements Screen {
         structures.add(new Structures(14, 1.5f, 1f, 0.5f, world, "metalblock2", 20));
         structures.add(new Structures(14, 2f, 1f, 0.5f, world, "metalblock1", 20));
         structures.add(new Structures(14, 2.5f, 1f, 0.5f, world, "metalblock2", 20));
-        structures.add(new Structures(13, 3f, 1f, 0.5f, world, "woodcone1", 20));
+//        structures.add(new Structures(13, 3f, 1f, 0.5f, world, "woodcone1", 20));
     }
 
     private void createGround() {
@@ -310,7 +310,7 @@ public class GameLevelThreeScreen implements Screen {
         @Override
         public boolean touchUp(int screenX, int screenY, int pointer, int button) {
             if (isDragging) {
-                Vector2 impulse = new Vector2(slingStart).sub(slingEnd).scl(10);
+                Vector2 impulse = new Vector2(slingStart).sub(slingEnd).scl(12.75f);
                 curBird.getBody().applyLinearImpulse(impulse, curBird.getBody().getWorldCenter(), true);
                 curBird.unfreezeBird();
                 isDragging = false;
@@ -336,7 +336,7 @@ public class GameLevelThreeScreen implements Screen {
         trajectoryPoints.clear();
 
         Vector2 startPosition = new Vector2(slingStart.x, slingStart.y);
-        Vector2 initialVelocity = new Vector2(slingStart).sub(slingEnd).scl(10);
+        Vector2 initialVelocity = new Vector2(slingStart).sub(slingEnd).scl(12.75f);
 
         Vector2 tempPosition = new Vector2(startPosition);
         Vector2 tempVelocity = new Vector2(initialVelocity);

@@ -74,7 +74,7 @@ public class AngryBird extends Actor {
                 radius = YELLOWRADIUS;
                 maxPower = MAXYELLOW;
                 break;
-            case "green":
+            case "white":
                 texture = new Texture("ui/angry birds/greenbird.png");
                 region = new TextureRegion(texture);
                 life = 1;
