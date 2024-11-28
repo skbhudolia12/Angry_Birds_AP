@@ -242,6 +242,7 @@ public class GameRandomLevelScreen implements Screen {
                 structure.takeDamage(structure.getDurability());
                 if (structure.isDestroyed()) {
                     System.out.println("Material destroyed! Queuing for destruction.");
+                    score+=100;
                     materialBody.setUserData(null);
                     bodiestoDestroy.add(structure.getBody());
                 }
@@ -256,6 +257,7 @@ public class GameRandomLevelScreen implements Screen {
             } else {
                 bird.flagInitialContact();
                 pig.onHit(pig.getLife());
+                score+=200;
                 System.out.println("Pig destroyed! Queuing for destruction.");
                 pigBody.setUserData(null);
                 bodiestoDestroy.add(pigBody);
