@@ -87,9 +87,8 @@ public class PauseScreen implements Screen {
                 try {
                 game.setScreen(currentLevelClass.getConstructor(AngryBirdsGame.class).newInstance(game));
                     pause = false;
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                } catch (NoSuchMethodException e) {
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                         NoSuchMethodException e) {
                     throw new RuntimeException(e);
                 }
             }

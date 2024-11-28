@@ -57,7 +57,7 @@ public class WinScreen implements Screen {
         nextLevelImage.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new GameLevelTwoScreen(game));
+                game.setScreen(nextScreen);
             }
         });
     }

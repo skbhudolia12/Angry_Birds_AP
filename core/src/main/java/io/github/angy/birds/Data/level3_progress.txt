@@ -1,2 +1,2 @@
-Score:2300
+Score:2200
 Completed:true

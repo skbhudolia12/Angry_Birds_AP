@@ -20,6 +20,8 @@ import io.github.angy.birds.AngryBirdsGame;
 import io.github.angy.birds.entities.AngryBird;
 import io.github.angy.birds.entities.Pig;
 import io.github.angy.birds.entities.Structures;
+import io.github.angy.birds.utils.LevelProgress;
+import io.github.angy.birds.utils.LoadSave;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -403,6 +405,11 @@ public class GameRandomLevelScreen implements Screen {
             if (tempPosition.y < 0) break;
         }
     }
+    public void saveGameProgress() {
+        boolean isCompleted = false;
+        LevelProgress progress = new LevelProgress(score, isCompleted);
+        LoadSave.saveProgress(101, progress);
+    }
 
     private void drawTrajectory() {
         shapeRenderer.setProjectionMatrix(camera.combined);
@@ -431,7 +438,8 @@ public class GameRandomLevelScreen implements Screen {
         boolean noObjectsMoving = pigs.stream().noneMatch(Pig::isMoving) && structures.stream().noneMatch(Structures::isMoving);
 
         if (allPigsDead && noObjectsMoving) {
-            game.setScreen(new MainMenu(game));
+            saveGameProgress();
+            game.setScreen(new WinScreen(game, (Screen) GameRandomLevelScreen.this , score, 2000));
         }
     }
 
@@ -478,14 +486,27 @@ public class GameRandomLevelScreen implements Screen {
             birdIndex++;
             if (birdForLevel.length > birdIndex) {
                 curBird.dispose();
-                createRandomBird();
+                curBird = birdForLevel[birdIndex];
+                System.out.println("Bird Changed. Score Right now "+ score);
                 isLaunched = false;
-            } else if (pigs.stream().allMatch(pig -> pig.isDead)) {
-                game.setScreen(new MainMenu(game));
-            } else {
-                game.setScreen(new LevelFailScreen(game));
+            }
+            else {
+                Screen nextLevel = new GameRandomLevelScreen(game);
+                if (score < 300) {
+                    game.setScreen(new LevelFailScreen(game));
+                    saveGameProgress();
+                } else if (pigs.stream().allMatch(Pig::isDead)) {
+                    score = score + 1500;
+                    game.setScreen(new WinScreen(game , nextLevel , score , 2000));
+                    saveGameProgress();
+                } else {
+                    game.setScreen(new WinScreen(game , nextLevel , score , 2000));
+                    saveGameProgress();
+                }
             }
         }
+
+
 
         // Draw pigs
         for(Pig pig : pigs){
