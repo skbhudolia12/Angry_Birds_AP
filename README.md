@@ -2,8 +2,6 @@
 # Angry Birds Game Documentation
 Created by [Sakshat](https://sak-drago.github.io) & [Sarthak]()
 
-![egg-loader-animation](https://github.com/user-attachments/assets/9acdf851-4c1e-4f5a-a282-ea23d4dda07d)
-
 ## Introduction
 This project is a recreation of the popular Angry Birds game using Java, libGDX, and Box2D with a twist. The game implements physics-based gameplay, multiple levels, and features such as serialization and JUnit testing.
 ---
@@ -70,6 +68,7 @@ This project is a recreation of the popular Angry Birds game using Java, libGDX,
    - **LibGDX**'s event-driven model, where buttons and objects listen for input events, follows the Observer pattern.  
 ---
 
+![egg-loader-animation](https://github.com/user-attachments/assets/9acdf851-4c1e-4f5a-a282-ea23d4dda07d)
 
 ## Serialization
 The game includes serialization to save and restore the state. The following attributes are saved:
