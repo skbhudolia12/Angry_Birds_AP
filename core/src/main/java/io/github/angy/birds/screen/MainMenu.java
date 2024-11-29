@@ -85,7 +85,6 @@ public class MainMenu implements Screen {
         stage.addActor(pillarImage2);
 
         skin.add("pillar", pillarImage);
-        // Create button style
     }
 
     private void createButtons() {

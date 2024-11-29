@@ -162,24 +162,6 @@ public class AngryBird extends Actor {
     }
 
     private void updateTexture() {
-//        //if (life <= maxLife / 2) {
-//            //if (texture != null) {
-//              //  texture.dispose();
-//            //}
-//
-//            switch (type) {
-//                case "red":
-//                    //texture = new Texture("skin/dead-red.png");
-//                    break;
-//                case "big":
-//                    //texture = new Texture("skin/dead-big.png");
-//                    break;
-//                case "yellow":
-//                    //texture = new Texture("skin/dead-yellow.png");
-//                    break;
-//            }
-//        }
-
         if (isDead) {
             texture = new Texture("textures/backgrounds/TransparentRectangle.png");
         }

@@ -38,7 +38,6 @@ public class GameRandomLevelScreen implements Screen {
 
     private World world;
     private Body groundBody;
-    private Box2DDebugRenderer debugRenderer;
 
     private AngryBird curBird;
     private Texture slingshotTexture;
@@ -69,18 +68,14 @@ public class GameRandomLevelScreen implements Screen {
         camera.position.set(8, 4.5f, 0); // Center camera
         camera.update();
 
-        // Box2D setup
         world = new World(new Vector2(0, -9.8f), true); // Gravity
-        debugRenderer = new Box2DDebugRenderer();
 
-        // Load textures
         slingshotTexture = new Texture("ui/slingshot.png");
         backgroundTexture = new Texture("ui/Angry Birds2.0/level1.png");
 
         slingStart = new Vector2(20, 20); // Adjust for your slingshot placement
         slingEnd = new Vector2(slingStart); // Sling end starts at slingStart
 
-        // Create entities
         createRandomLevel();
         shapeRenderer = new ShapeRenderer();
         trajectoryPoints = new ArrayList<>();
@@ -128,7 +123,6 @@ public class GameRandomLevelScreen implements Screen {
         rightWallShape.dispose();
     }
     private void createRandomLevel() {
-        // Randomly determine the number and type of birds
         int numBirds = random.nextInt(3) + 1;
         birdForLevel = new AngryBird[numBirds];
         for (int i = 0; i < numBirds; i++) {
@@ -136,13 +130,11 @@ public class GameRandomLevelScreen implements Screen {
         }
         curBird = birdForLevel[0];
 
-        // Randomly determine the type of blocks at fixed positions
         float[][] blockPositions = new float[4][2];
         for (int i = 0; i < blockPositions.length; i++) {
             blockPositions[i][0] = 12 + random.nextInt(4); // x between 12 and 15
             blockPositions[i][1] = 1.5f + (random.nextInt(4) * 0.5f); // y values: 1.5, 2.0, 2.5, or 3.0
         }
-
 
         float[][] pigPositions = new float[4][2];
         for (int i = 0; i < pigPositions.length; i++) {
@@ -214,7 +206,6 @@ public class GameRandomLevelScreen implements Screen {
             Body bodyA = fixtureA.getBody();
             Body bodyB = fixtureB.getBody();
 
-            // Handle pig collisions
             if (isPigBody(bodyA)) {
                 if (isMaterialBody(bodyB) || isPigBody(bodyB) || isGroundBody(bodyB)) handlePigCollision(bodyA);
                 else if (isBirdBody(bodyB)) killPig(bodyA, bodyB);
@@ -223,7 +214,6 @@ public class GameRandomLevelScreen implements Screen {
                 else if (isBirdBody(bodyA)) killPig(bodyB, bodyA);
             }
 
-            // Handle material collisions
             if (isMaterialBody(bodyA)) {
                 if (isMaterialBody(bodyB) || isPigBody(bodyB) || isGroundBody(bodyB)) handleMaterialCollision(bodyA);
                 else if (isBirdBody(bodyB)) destroyMaterial(bodyA, bodyB);
@@ -286,7 +276,6 @@ public class GameRandomLevelScreen implements Screen {
         }
 
         private boolean isGroundBody(Body body) {
-            // Assuming groundBody is a predefined Body instance representing the ground
             return body == getGroundBody();
         }
 
@@ -337,14 +326,12 @@ public class GameRandomLevelScreen implements Screen {
                 camera.unproject(touchPoint);
                 slingEnd.set(touchPoint.x, touchPoint.y);
 
-                // Limit the pull distance
                 Vector2 pullVector = new Vector2(slingEnd).sub(slingStart);
                 if (pullVector.len() > MAX_PULL_DISTANCE) {
                     pullVector.setLength(MAX_PULL_DISTANCE);
                     slingEnd.set(slingStart).add(pullVector);
                 }
 
-                // Update bird position while dragging
                 curBird.getBody().setTransform(slingEnd.x, slingEnd.y, curBird.getBody().getAngle());
                 calculateTrajectory();
                 return true;
@@ -379,31 +366,22 @@ public class GameRandomLevelScreen implements Screen {
     private void calculateTrajectory() {
         trajectoryPoints.clear(); // Clear old points
 
-        // Start position is slingStart because that's where the pull starts
         Vector2 startPosition = new Vector2(slingStart.x, slingStart.y);
 
-        // Calculate the initial velocity based on the pull force
         Vector2 initialVelocity = new Vector2(slingStart).sub(slingEnd).scl(12.75f); // Adjust scaling factor as needed
 
-        // Copy the start position and velocity to simulate the trajectory
         Vector2 tempPosition = new Vector2(startPosition);
         Vector2 tempVelocity = new Vector2(initialVelocity);
 
-        // Time step for simulation
         float timeStep = 1 / 120f;
 
-        // Simulate trajectory points
         for (int i = 0; i < 180; i++) { // Adjust the number of points as needed
-            // Update velocity due to gravity
             tempVelocity.y += world.getGravity().y * timeStep;
 
-            // Update position based on velocity
             tempPosition.mulAdd(tempVelocity, timeStep);
 
-            // Store the calculated point
             trajectoryPoints.add(new Vector2(tempPosition));
 
-            // Stop if the point is below the ground (y < 0)
             if (tempPosition.y < 0) break;
         }
     }
@@ -426,23 +404,6 @@ public class GameRandomLevelScreen implements Screen {
         }
 
         shapeRenderer.end();
-    }
-
-    private void checkWinOrLose() {
-        // Check for lose condition: no more birds
-        if (birdIndex >= birdForLevel.length) {
-            game.setScreen(new LevelFailScreen(game,4));
-            return;
-        }
-
-        // Check for win condition: all pigs are dead and no objects are moving
-        boolean allPigsDead = pigs.stream().allMatch(pig -> pig.isDead);
-        boolean noObjectsMoving = pigs.stream().noneMatch(Pig::isMoving) && structures.stream().noneMatch(Structures::isMoving);
-
-        if (allPigsDead && noObjectsMoving) {
-            saveGameProgress();
-            game.setScreen(new WinScreen(game, (Screen) GameRandomLevelScreen.this , score, 2000,4));
-        }
     }
 
     @Override
@@ -528,13 +489,11 @@ public class GameRandomLevelScreen implements Screen {
             drawTrajectory();
         }
 
-        debugRenderer.render(world , camera.combined);
     }
 
     @Override
     public void dispose() {
         world.dispose();
-        debugRenderer.dispose();
         slingshotTexture.dispose();
         backgroundTexture.dispose();
         curBird.dispose();

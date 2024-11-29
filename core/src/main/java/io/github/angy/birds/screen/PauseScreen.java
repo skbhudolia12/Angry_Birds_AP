@@ -18,7 +18,6 @@ import io.github.angy.birds.AngryBirdsGame;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
-import java.lang.reflect.InvocationTargetException;
 
 public class PauseScreen implements Screen {
     public static boolean pause = true;

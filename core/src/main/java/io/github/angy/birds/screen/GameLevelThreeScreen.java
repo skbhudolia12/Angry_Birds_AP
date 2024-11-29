@@ -34,7 +34,6 @@ public class GameLevelThreeScreen implements Screen {
 
     private World world;
     private Body groundBody;
-    private Box2DDebugRenderer debugRenderer;
 
     private AngryBird curBird;
     private Texture slingshotTexture;
@@ -52,6 +51,7 @@ public class GameLevelThreeScreen implements Screen {
     public int score;
     private int birdIndex = 0;
 
+    GameSound soundManagement = new GameSound();
     private List<Pig> pigs;
     private List<Structures> structures;
 
@@ -59,26 +59,21 @@ public class GameLevelThreeScreen implements Screen {
 
     public GameLevelThreeScreen(AngryBirdsGame game) {
         this.game = game;
-        this.nextLevel = new GameRandomLevelScreen(game); // Replace with next level screen if applicable
-
-        // Setup camera and viewport
+        this.nextLevel = new GameRandomLevelScreen(game);
         camera = new OrthographicCamera();
         viewport = new FitViewport(16, 9, camera);
         camera.position.set(8, 4.5f, 0);
         camera.update();
 
-        // Box2D setup
         world = new World(new Vector2(0, -9.8f), true);
-        debugRenderer = new Box2DDebugRenderer();
 
-        // Load textures
+        soundManagement.playChirpingSound();
         slingshotTexture = new Texture("ui/slingshot.png");
         backgroundTexture = new Texture("ui/Angry Birds2.0/level1.png");
 
         slingStart = new Vector2(2, 2);
         slingEnd = new Vector2(slingStart);
 
-        // Create game entities
         createBirds();
         createGround();
         createPigs();
@@ -96,7 +91,6 @@ public class GameLevelThreeScreen implements Screen {
 
     private void createPigs() {
         pigs = new ArrayList<>();
-        // Add pigs with different positions for level 3
         pigs.add(new Pig(12, 3, world, "small"));
         pigs.add(new Pig(13, 2f, world, "king"));
         pigs.add(new Pig(14, 3, world, "small"));
@@ -104,7 +98,6 @@ public class GameLevelThreeScreen implements Screen {
 
     private void createStructures() {
         structures = new ArrayList<>();
-        // Add more complex structures for level 3
         structures.add(new Structures(12, 1.5f, 1f, 0.5f, world, "metalblock1", 20));
         structures.add(new Structures(12, 2f, 1f, 0.5f, world, "metalblock2", 20));
         structures.add(new Structures(12, 2.5f, 1f, 0.5f, world, "metalblock1", 20));
@@ -113,11 +106,9 @@ public class GameLevelThreeScreen implements Screen {
         structures.add(new Structures(14, 1.5f, 1f, 0.5f, world, "metalblock2", 20));
         structures.add(new Structures(14, 2f, 1f, 0.5f, world, "metalblock1", 20));
         structures.add(new Structures(14, 2.5f, 1f, 0.5f, world, "metalblock2", 20));
-//        structures.add(new Structures(13, 3f, 1f, 0.5f, world, "woodcone1", 20));
     }
 
     private void createGround() {
-        // Ground setup similar to Level 1
         BodyDef groundBodyDef = new BodyDef();
         groundBodyDef.position.set(8, 0);
 
@@ -169,7 +160,6 @@ public class GameLevelThreeScreen implements Screen {
             Body bodyA = fixtureA.getBody();
             Body bodyB = fixtureB.getBody();
 
-            // Handle pig collisions
             if (isPigBody(bodyA)) {
                 if (isMaterialBody(bodyB) || isPigBody(bodyB) || isGroundBody(bodyB)) handlePigCollision(bodyA);
                 else if (isBirdBody(bodyB)) killPig(bodyA, bodyB);
@@ -178,7 +168,6 @@ public class GameLevelThreeScreen implements Screen {
                 else if (isBirdBody(bodyA)) killPig(bodyB, bodyA);
             }
 
-            // Handle material collisions
             if (isMaterialBody(bodyA)) {
                 if (isMaterialBody(bodyB) || isPigBody(bodyB) || isGroundBody(bodyB)) handleMaterialCollision(bodyA);
                 else if (isBirdBody(bodyB)) destroyMaterial(bodyA, bodyB);
@@ -241,7 +230,6 @@ public class GameLevelThreeScreen implements Screen {
         }
 
         private boolean isGroundBody(Body body) {
-            // Assuming groundBody is a predefined Body instance representing the ground
             return body == getGroundBody();
         }
 
@@ -292,14 +280,12 @@ public class GameLevelThreeScreen implements Screen {
                 camera.unproject(touchPoint);
                 slingEnd.set(touchPoint.x, touchPoint.y);
 
-                // Limit the pull distance
                 Vector2 pullVector = new Vector2(slingEnd).sub(slingStart);
                 if (pullVector.len() > MAX_PULL_DISTANCE) {
                     pullVector.setLength(MAX_PULL_DISTANCE);
                     slingEnd.set(slingStart).add(pullVector);
                 }
 
-                // Update bird position while dragging
                 curBird.getBody().setTransform(slingEnd.x, slingEnd.y, curBird.getBody().getAngle());
                 calculateTrajectory();
                 return true;
@@ -331,7 +317,6 @@ public class GameLevelThreeScreen implements Screen {
         }
     }
 
-    // Methods for trajectory calculation and drawing (same as Level 1)
     private void calculateTrajectory() {
         trajectoryPoints.clear();
 
@@ -406,7 +391,6 @@ public class GameLevelThreeScreen implements Screen {
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
-        // Destroy bodies that need to be removed
         for (Body body : bodiestoDestroy) {
             world.destroyBody(body);
         }
@@ -418,7 +402,6 @@ public class GameLevelThreeScreen implements Screen {
 
         curBird.draw(batch);
 
-        // Handle bird launching and switching
         if (isLaunched && !curBird.isMoving()) {
             birdIndex++;
             if (birdForLevel.length > birdIndex) {
@@ -444,14 +427,12 @@ public class GameLevelThreeScreen implements Screen {
             }
         }
 
-        // Draw pigs
         for (Pig pig : pigs) {
             if (!pig.isDead) {
                 pig.draw(batch);
             }
         }
 
-        // Draw structures
         for (Structures structure : structures) {
             if (!structure.isDestroyed()) {
                 structure.draw(batch);
@@ -463,13 +444,11 @@ public class GameLevelThreeScreen implements Screen {
             drawTrajectory();
         }
 
-        debugRenderer.render(world, camera.combined);
     }
 
     @Override
     public void dispose() {
         world.dispose();
-        debugRenderer.dispose();
         slingshotTexture.dispose();
         backgroundTexture.dispose();
         curBird.dispose();

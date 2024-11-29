@@ -53,6 +53,7 @@
         private int birdIndex = 0;
 
         // Add a list to store pigs
+        GameSound soundManagmenet = new GameSound();
         private List<Pig> pigs;
         private List<Structures> structures;
 
@@ -62,20 +63,18 @@
         public GameLevelOneScreen(AngryBirdsGame game) {
             this.game = game;
             this.nextLevel = new GameLevelTwoScreen(game);
-            // Setup camera and viewport
             camera = new OrthographicCamera();
             viewport = new FitViewport(16, 9, camera); // Aspect ratio: 16:9
             camera.position.set(8, 4.5f, 0); // Center camera
             camera.update();
 
-            // Box2D setup
+            soundManagmenet.playChirpingSound();
             world = new World(new Vector2(0, -9.8f), true); // Gravity
 
-            // Load textures
             slingshotTexture = new Texture("ui/slingshot.png");
             backgroundTexture = new Texture("ui/Angry Birds2.0/level1.png");
 
-            slingStart = new Vector2(20, 20); // Adjust for your slingshot placement
+            slingStart = new Vector2(20, 20);
             slingEnd = new Vector2(slingStart); // Sling end starts at slingStart
 
             // Create entities
@@ -325,31 +324,22 @@
         private void calculateTrajectory() {
             trajectoryPoints.clear(); // Clear old points
 
-            // Start position is slingStart because that's where the pull starts
             Vector2 startPosition = new Vector2(slingStart.x, slingStart.y);
 
-            // Calculate the initial velocity based on the pull force
             Vector2 initialVelocity = new Vector2(slingStart).sub(slingEnd).scl(12.75f); // Adjust scaling factor as needed
 
-            // Copy the start position and velocity to simulate the trajectory
             Vector2 tempPosition = new Vector2(startPosition);
             Vector2 tempVelocity = new Vector2(initialVelocity);
 
-            // Time step for simulation
             float timeStep = 1 / 120f;
 
-            // Simulate trajectory points
             for (int i = 0; i < 180; i++) { // Adjust the number of points as needed
-                // Update velocity due to gravity
                 tempVelocity.y += world.getGravity().y * timeStep;
 
-                // Update position based on velocity
                 tempPosition.mulAdd(tempVelocity, timeStep);
 
-                // Store the calculated point
                 trajectoryPoints.add(new Vector2(tempPosition));
 
-                // Stop if the point is below the ground (y < 0)
                 if (tempPosition.y < 0) break;
             }
         }
@@ -359,11 +349,11 @@
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             shapeRenderer.setColor(Color.BLACK);
 
-            int spacing = 5; // Adjust spacing to skip points (higher value = greater spacing)
+            int spacing = 5;
 
             for (int i = 0; i < trajectoryPoints.size(); i += spacing) {
                 Vector2 point = trajectoryPoints.get(i);
-                shapeRenderer.circle(point.x, point.y, 0.05f, 20); // Adjust radius for visibility
+                shapeRenderer.circle(point.x, point.y, 0.05f, 20);
             }
 
             shapeRenderer.end();

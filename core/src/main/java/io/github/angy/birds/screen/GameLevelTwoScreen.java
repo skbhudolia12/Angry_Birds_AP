@@ -34,7 +34,6 @@ public class GameLevelTwoScreen implements Screen {
 
     private World world;
     private Body groundBody;
-    private Box2DDebugRenderer debugRenderer;
 
     private AngryBird curBird;
     private Texture slingshotTexture;
@@ -52,6 +51,7 @@ public class GameLevelTwoScreen implements Screen {
     public int score;
     private int birdIndex = 0;
 
+    GameSound soundManagment = new GameSound();
     private List<Pig> pigs;
     private List<Structures> structures;
     private List<Body> bodiestoDestroy = new ArrayList<>();
@@ -60,24 +60,20 @@ public class GameLevelTwoScreen implements Screen {
         this.game = game;
         this.nextLevel = new GameLevelThreeScreen(game);
 
-        // Setup camera and viewport
         camera = new OrthographicCamera();
         viewport = new FitViewport(16, 9, camera); // Aspect ratio: 16:9
         camera.position.set(8, 4.5f, 0); // Center camera
         camera.update();
 
-        // Box2D setup
+        soundManagment.playChirpingSound();
         world = new World(new Vector2(0, -9.8f), true); // Gravity
-        debugRenderer = new Box2DDebugRenderer();
 
-        // Load textures
         slingshotTexture = new Texture("ui/slingshot.png");
         backgroundTexture = new Texture("ui/Angry Birds2.0/level1.png");
 
-        slingStart = new Vector2(20, 20); // Adjust for your slingshot placement
+        slingStart = new Vector2(20, 20);
         slingEnd = new Vector2(slingStart); // Sling end starts at slingStart
 
-        // Create entities
         createBirds();
         createGround();
         createPigs();
@@ -159,7 +155,6 @@ public class GameLevelTwoScreen implements Screen {
             Body bodyA = fixtureA.getBody();
             Body bodyB = fixtureB.getBody();
 
-            // Handle pig collisions
             if (isPigBody(bodyA)) {
                 if (isMaterialBody(bodyB) || isPigBody(bodyB) || isGroundBody(bodyB)) handlePigCollision(bodyA);
                 else if (isBirdBody(bodyB)) killPig(bodyA, bodyB);
@@ -168,7 +163,6 @@ public class GameLevelTwoScreen implements Screen {
                 else if (isBirdBody(bodyA)) killPig(bodyB, bodyA);
             }
 
-            // Handle material collisions
             if (isMaterialBody(bodyA)) {
                 if (isMaterialBody(bodyB) || isPigBody(bodyB) || isGroundBody(bodyB)) handleMaterialCollision(bodyA);
                 else if (isBirdBody(bodyB)) destroyMaterial(bodyA, bodyB);
@@ -284,14 +278,12 @@ public class GameLevelTwoScreen implements Screen {
                 camera.unproject(touchPoint);
                 slingEnd.set(touchPoint.x, touchPoint.y);
 
-                // Limit the pull distance
                 Vector2 pullVector = new Vector2(slingEnd).sub(slingStart);
                 if (pullVector.len() > MAX_PULL_DISTANCE) {
                     pullVector.setLength(MAX_PULL_DISTANCE);
                     slingEnd.set(slingStart).add(pullVector);
                 }
 
-                // Update bird position while dragging
                 curBird.getBody().setTransform(slingEnd.x, slingEnd.y, curBird.getBody().getAngle());
                 calculateTrajectory();
                 return true;
@@ -326,31 +318,22 @@ public class GameLevelTwoScreen implements Screen {
     private void calculateTrajectory() {
         trajectoryPoints.clear(); // Clear old points
 
-        // Start position is slingStart because that's where the pull starts
         Vector2 startPosition = new Vector2(slingStart.x, slingStart.y);
 
-        // Calculate the initial velocity based on the pull force
         Vector2 initialVelocity = new Vector2(slingStart).sub(slingEnd).scl(12.75f); // Adjust scaling factor as needed
 
-        // Copy the start position and velocity to simulate the trajectory
         Vector2 tempPosition = new Vector2(startPosition);
         Vector2 tempVelocity = new Vector2(initialVelocity);
 
-        // Time step for simulation
         float timeStep = 1 / 120f;
 
-        // Simulate trajectory points
         for (int i = 0; i < 180; i++) { // Adjust the number of points as needed
-            // Update velocity due to gravity
             tempVelocity.y += world.getGravity().y * timeStep;
 
-            // Update position based on velocity
             tempPosition.mulAdd(tempVelocity, timeStep);
 
-            // Store the calculated point
             trajectoryPoints.add(new Vector2(tempPosition));
 
-            // Stop if the point is below the ground (y < 0)
             if (tempPosition.y < 0) break;
         }
     }
@@ -452,13 +435,11 @@ public class GameLevelTwoScreen implements Screen {
             drawTrajectory();
         }
 
-        debugRenderer.render(world , camera.combined);
     }
 
     @Override
     public void dispose() {
         world.dispose();
-        debugRenderer.dispose();
         slingshotTexture.dispose();
         backgroundTexture.dispose();
         curBird.dispose();
