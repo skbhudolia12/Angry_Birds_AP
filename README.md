@@ -7,8 +7,7 @@ Created by [Sakshat](https://sak-drago.github.io) & [Sarthak]()
 ## Introduction
 This project is a recreation of the popular Angry Birds game using Java, libGDX, and Box2D with a twist. The game implements physics-based gameplay, multiple levels, and features such as serialization and JUnit testing.
 ---
-
-### Gif to be inserted
+![level1_gif](https://github.com/user-attachments/assets/01dbaabd-9cb8-454f-bd9e-0609c1046b7e)
 
 ---
 
@@ -76,15 +75,24 @@ This project is a recreation of the popular Angry Birds game using Java, libGDX,
 The game includes serialization to save and restore the state. The following attributes are saved:
 - Current level.  
 - Progress within the current level.  
-- States of all entities (Angry Birds, Pigs, Structures).  
 - Completed levels.
+
+The serialisation was used to:
+- Determine the current score.
+- How many stars to award.
+- How many stars were awarded to the player.
+- To save the state during pause screen.
 
 ---
 
 ## JUnit Testing
+
+Using Headless for OpenGL simulation (The Secret Sauce to JUnit testing on OpenGL based applications), we tested core componenets of the game.
 The project includes JUnit tests to validate critical functionalities:
 1. **Damage Validation**: Ensures that collision-based damage calculations are correct.  
 2. **Bird Iterator**: Verifies the correct iteration over available birds in a level.
+3. **Bird Location**: Verifies if the bird is moving correctly or not.
+4. **Bird Relocation**: Whether the game verifies the bird's relocation and uses it to determine swinging.
 
 To run tests, execute:
 ```bash
