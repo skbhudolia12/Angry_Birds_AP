@@ -38,7 +38,7 @@ public class MainMenu implements Screen {
     private Texture backgroundTexture;
     private TextureRegion backgroundTextureRegion;
     private TextureRegionDrawable backgroundDrawable;
-    private GameSound gameSound;
+    private GameSound gameSound = new GameSound();
 
     public MainMenu(final AngryBirdsGame game) {
         this.game = game;
@@ -47,7 +47,6 @@ public class MainMenu implements Screen {
 
         loadAssets();
         createButtons();
-        gameSound = new GameSound();
     }
 
     private void loadAssets() {
@@ -100,6 +99,7 @@ public class MainMenu implements Screen {
                 ScaleToAction enlargeAction = new ScaleToAction();
                 enlargeAction.setScale(1.1f);
                 enlargeAction.setDuration(0.2f);
+                gameSound.playHoverSound();
                 playButton.addAction(enlargeAction);
             }
             @Override
@@ -131,6 +131,7 @@ public class MainMenu implements Screen {
                 ScaleToAction enlargeAction = new ScaleToAction();
                 enlargeAction.setScale(1.1f);
                 enlargeAction.setDuration(0.2f);
+                gameSound.playHoverSound();
                 muteButton.addAction(enlargeAction);
             }
             @Override
@@ -149,10 +150,12 @@ public class MainMenu implements Screen {
                 if(flag[0]){
                     gameSound.stopThemeSound();
                     muteButton.setDrawable(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("ui/unmute_bird.png")))));
+                    gameSound.isMuted(true);
                     flag[0] = false;
                 } else {
                     gameSound.playThemeSound();
                     muteButton.setDrawable(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("ui/mute_bird.png")))));
+                    gameSound.isMuted(false);
                     flag[0] = true;
                 }
             }
@@ -171,6 +174,7 @@ public class MainMenu implements Screen {
                 ScaleToAction enlargeAction = new ScaleToAction();
                 enlargeAction.setScale(1.1f);
                 enlargeAction.setDuration(0.2f);
+                gameSound.playHoverSound();
                 exitButton.addAction(enlargeAction);
             }
             @Override

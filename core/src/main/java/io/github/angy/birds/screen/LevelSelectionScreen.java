@@ -3,6 +3,7 @@ package io.github.angy.birds.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -13,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import io.github.angy.birds.AngryBirdsGame;
 import io.github.angy.birds.utils.LevelProgress;
@@ -31,7 +33,7 @@ public class LevelSelectionScreen implements Screen {
     private Image level2Button;
     private Image level3Button;
     private Image ReturnButton;
-    private GameSound gameSound;
+    GameSound SoundManagement = new GameSound();
 
     public LevelSelectionScreen(final AngryBirdsGame game) {
         this.game = game;
@@ -40,7 +42,6 @@ public class LevelSelectionScreen implements Screen {
 
         loadAssets();
         createButtons();
-        gameSound = new GameSound();
     }
 
     private void loadAssets() {
@@ -79,6 +80,7 @@ public class LevelSelectionScreen implements Screen {
         }
         level1Button.addListener(new InputListener() {
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                SoundManagement.playHoverSound();
                 level1Button.addAction(Actions.scaleTo(1.1f, 1.1f, 0.2f));
             }
 
@@ -89,7 +91,7 @@ public class LevelSelectionScreen implements Screen {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                gameSound.stopLevelSelectionSound();
+                SoundManagement.stopLevelSelectionSound();
                 game.setScreen(new GameLevelOneScreen(game));
                 return true;
             }
@@ -123,6 +125,7 @@ public class LevelSelectionScreen implements Screen {
         level2Button.addListener(new InputListener() {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                SoundManagement.playHoverSound();
                 level2Button.addAction(Actions.scaleTo(1.1f, 1.1f, 0.2f));
             }
 
@@ -133,7 +136,7 @@ public class LevelSelectionScreen implements Screen {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                gameSound.stopLevelSelectionSound();
+                SoundManagement.stopLevelSelectionSound();
                 game.setScreen(new GameLevelTwoScreen(game));
                 return true;
             }
@@ -168,6 +171,7 @@ public class LevelSelectionScreen implements Screen {
         level3Button.addListener(new InputListener() {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                SoundManagement.playHoverSound();
                 level3Button.addAction(Actions.scaleTo(1.1f, 1.1f, 0.2f));
             }
 
@@ -178,7 +182,7 @@ public class LevelSelectionScreen implements Screen {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                gameSound.stopLevelSelectionSound();
+                SoundManagement.stopLevelSelectionSound();
                 game.setScreen(new GameLevelThreeScreen(game));
                 return true;
             }
@@ -195,6 +199,7 @@ public class LevelSelectionScreen implements Screen {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                 ReturnButton.addAction(Actions.scaleTo(1.1f, 1.1f, 0.2f));
+                SoundManagement.playHoverSound();
             }
 
             @Override
@@ -205,7 +210,7 @@ public class LevelSelectionScreen implements Screen {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 game.setScreen(new MainMenu(game));
-                gameSound.stopLevelSelectionSound();
+                SoundManagement.stopLevelSelectionSound();
                 return true;
             }
         });
@@ -214,8 +219,8 @@ public class LevelSelectionScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
-        gameSound.stopThemeSound();
-        gameSound.playLevelSelectionSound();
+        SoundManagement.stopThemeSound();
+        SoundManagement.playLevelSelectionSound();
     }
 
     @Override
