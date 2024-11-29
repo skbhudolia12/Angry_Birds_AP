@@ -21,6 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 
 public class PauseScreen implements Screen {
     public static boolean pause = true;
+    private int screen_number;
     private final AngryBirdsGame game;
     private Screen lastScreen;
     private Stage stage;
@@ -31,10 +32,10 @@ public class PauseScreen implements Screen {
     private Image backgroundImage;
     private Class<? extends Screen> currentLevelClass;
 
-    public PauseScreen(final AngryBirdsGame game, Screen lastScreen, Class<? extends Screen> currentLevelClass) {
+    public PauseScreen(final AngryBirdsGame game, Screen lastScreen,int screen_number) {
         this.game = game;
         this.lastScreen = lastScreen;
-        this.currentLevelClass = currentLevelClass;
+        this.screen_number = screen_number;
         stage = new Stage(new FitViewport(1920, 1080));
         Gdx.input.setInputProcessor(stage);
 
@@ -84,13 +85,19 @@ public class PauseScreen implements Screen {
         restartButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                try {
-                game.setScreen(currentLevelClass.getConstructor(AngryBirdsGame.class).newInstance(game));
-                    pause = false;
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                         NoSuchMethodException e) {
-                    throw new RuntimeException(e);
+                if(screen_number==1){
+                    game.setScreen(new GameLevelOneScreen(game));
                 }
+                else if (screen_number==2){
+                    game.setScreen(new GameLevelTwoScreen(game));
+                }
+                else if (screen_number==3){
+                    game.setScreen(new GameLevelThreeScreen(game));
+                }
+                else{
+                    game.setScreen(new GameRandomLevelScreen(game));
+                }
+
             }
         });
     }

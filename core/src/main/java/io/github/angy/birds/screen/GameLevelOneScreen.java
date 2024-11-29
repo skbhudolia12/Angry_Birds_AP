@@ -267,7 +267,7 @@
             @Override
             public boolean keyDown(int keycode) {
                 if (keycode == Input.Keys.P) {
-                    game.setScreen(new PauseScreen(game, (Screen) GameLevelOneScreen.this , (Class<? extends Screen>) this.getClass()));
+                    game.setScreen(new PauseScreen(game, (Screen) GameLevelOneScreen.this ,1));
                     paused = PauseScreen.pause;
                     return true;
                 }
@@ -435,15 +435,15 @@
             }
             else {
                 if (score < 300) {
-                    game.setScreen(new LevelFailScreen(game));
+                    game.setScreen(new LevelFailScreen(game,1));
                     saveGameProgress();
                 } else if (pigs.stream().allMatch(Pig::isDead)) {
                     score = score + 1500;
-                    game.setScreen(new WinScreen(game , nextLevel , score , 2000));
+                    game.setScreen(new WinScreen(game , nextLevel , score , 2000, 1));
                     isCompleted = true;
                     saveGameProgress();
                 } else {
-                    game.setScreen(new WinScreen(game , nextLevel , score , 2000));
+                    game.setScreen(new WinScreen(game , nextLevel , score , 2000,1));
                     isCompleted = true;
                     saveGameProgress();
                 }

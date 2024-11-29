@@ -129,7 +129,7 @@ public class GameRandomLevelScreen implements Screen {
     }
     private void createRandomLevel() {
         // Randomly determine the number and type of birds
-        int numBirds = random.nextInt(5) + 1; // 1 to 5 birds
+        int numBirds = random.nextInt(3) + 1;
         birdForLevel = new AngryBird[numBirds];
         for (int i = 0; i < numBirds; i++) {
             birdForLevel[i] = createRandomBird();
@@ -145,9 +145,9 @@ public class GameRandomLevelScreen implements Screen {
 
 
         float[][] pigPositions = new float[4][2];
-        for (int i = 0; i < blockPositions.length; i++) {
-            blockPositions[i][0] = 12 + random.nextInt(4); // x between 12 and 15
-            blockPositions[i][1] = 1.5f + (random.nextInt(4) * 0.5f); // y values: 1.5, 2.0, 2.5, or 3.0
+        for (int i = 0; i < pigPositions.length; i++) {
+            pigPositions[i][0] = 12 + random.nextInt(4); // x between 12 and 15
+            pigPositions[i][1] = 1.5f + (random.nextInt(4) * 0.5f); // y values: 1.5, 2.0, 2.5, or 3.0
         }
 
         for (float[] position : pigPositions) {
@@ -169,9 +169,9 @@ public class GameRandomLevelScreen implements Screen {
             case 1:
                 return new AngryBird(2,2, world, "yellow");
             case 2:
-                return new AngryBird(2,2, world, "red");
+                return new AngryBird(2,2, world, "black");
             default:
-                return new AngryBird(2,2, world, "red");
+                return new AngryBird(2,2, world, "blue");
         }
     }
     private Pig createRandomPig(float x, float y) {
@@ -368,7 +368,7 @@ public class GameRandomLevelScreen implements Screen {
         @Override
         public boolean keyDown(int keycode) {
             if (keycode == Input.Keys.P) {
-                game.setScreen(new PauseScreen(game, (Screen) GameRandomLevelScreen.this , (Class<? extends Screen>) this.getClass()));
+                game.setScreen(new PauseScreen(game, (Screen) GameRandomLevelScreen.this , 4));
                 paused = PauseScreen.pause;
                 return true;
             }
@@ -431,7 +431,7 @@ public class GameRandomLevelScreen implements Screen {
     private void checkWinOrLose() {
         // Check for lose condition: no more birds
         if (birdIndex >= birdForLevel.length) {
-            game.setScreen(new LevelFailScreen(game));
+            game.setScreen(new LevelFailScreen(game,4));
             return;
         }
 
@@ -441,7 +441,7 @@ public class GameRandomLevelScreen implements Screen {
 
         if (allPigsDead && noObjectsMoving) {
             saveGameProgress();
-            game.setScreen(new WinScreen(game, (Screen) GameRandomLevelScreen.this , score, 2000));
+            game.setScreen(new WinScreen(game, (Screen) GameRandomLevelScreen.this , score, 2000,4));
         }
     }
 
@@ -495,14 +495,14 @@ public class GameRandomLevelScreen implements Screen {
             else {
                 Screen nextLevel = new GameRandomLevelScreen(game);
                 if (score < 300) {
-                    game.setScreen(new LevelFailScreen(game));
+                    game.setScreen(new LevelFailScreen(game,4));
                     saveGameProgress();
                 } else if (pigs.stream().allMatch(Pig::isDead)) {
                     score = score + 1500;
-                    game.setScreen(new WinScreen(game , nextLevel , score , 2000));
+                    game.setScreen(new WinScreen(game , nextLevel , score , 2000,4));
                     saveGameProgress();
                 } else {
-                    game.setScreen(new WinScreen(game , nextLevel , score , 2000));
+                    game.setScreen(new WinScreen(game , nextLevel , score , 2000,4));
                     saveGameProgress();
                 }
             }

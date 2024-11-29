@@ -19,6 +19,7 @@ public class WinScreen implements Screen {
     private final AngryBirdsGame game;
     private final Screen lastScreen;
     private final Screen nextScreen;
+    private int screen_number;
     private Stage stage;
     private Skin skin;
     private Image backgroundImage;
@@ -29,10 +30,11 @@ public class WinScreen implements Screen {
     private int score;
     private int maxScore;
 
-    public WinScreen(final AngryBirdsGame game, Screen nextScreen, int score, int maxScore) {
+    public WinScreen(final AngryBirdsGame game, Screen nextScreen, int score, int maxScore, int screen_number) {
         this.game = game;
         this.lastScreen = game.getScreen();
         this.nextScreen = nextScreen;
+        this.screen_number = screen_number;
         this.score = score;
         this.maxScore = maxScore;
         stage = new Stage(new FitViewport(1920, 1080));
@@ -50,7 +52,18 @@ public class WinScreen implements Screen {
         ReseartLevelImage.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(lastScreen);
+                if(screen_number==1){
+                    game.setScreen(new GameLevelOneScreen(game));
+                }
+                else if(screen_number==2){
+                    game.setScreen(new GameLevelTwoScreen(game));
+                }
+                else if(screen_number==3){
+                    game.setScreen(new GameLevelThreeScreen(game));
+                }
+                else{
+                    game.setScreen(new GameRandomLevelScreen(game));
+                }
             }
         });
 

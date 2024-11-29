@@ -76,7 +76,7 @@ public class Pig {
         fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = density;
-        fixtureDef.friction = 10f;
+        fixtureDef.friction = 100f;
         fixtureDef.restitution = 0f; // Less bouncy for pigs
         body.setUserData(this);
         body.createFixture(fixtureDef);

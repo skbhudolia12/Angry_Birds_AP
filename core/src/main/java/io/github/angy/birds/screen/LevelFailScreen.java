@@ -21,11 +21,13 @@ public class LevelFailScreen implements Screen {
     private Stage stage;
     private Skin skin;
     private Image backgroundImage;
+    private int screen_number;
     private Image retryButton;
     private Image mainMenuButton;
 
-    public LevelFailScreen(final AngryBirdsGame game) {
+    public LevelFailScreen(final AngryBirdsGame game, final int screen_number) {
         this.game = game;
+        this.screen_number=screen_number;
         stage = new Stage(new FitViewport(1920, 1080));
         Gdx.input.setInputProcessor(stage);
 
@@ -51,7 +53,18 @@ public class LevelFailScreen implements Screen {
     retryButton.addListener(new ClickListener() {
         @Override
         public void clicked(InputEvent event, float x, float y) {
-            game.setScreen(new GameLevelOneScreen(game)); // Change to the appropriate level screen
+            if(screen_number==1){
+                game.setScreen(new GameLevelOneScreen(game));
+            }
+            else if(screen_number==2){
+                game.setScreen(new GameLevelTwoScreen(game));
+            }
+            else if(screen_number==3){
+                game.setScreen(new GameLevelThreeScreen(game));
+            }
+            else{
+                game.setScreen(new GameRandomLevelScreen(game));
+            }
         }
     });
     retryButton.addListener(new InputListener() {

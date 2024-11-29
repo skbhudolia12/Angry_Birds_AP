@@ -323,7 +323,7 @@ public class GameLevelThreeScreen implements Screen {
         @Override
         public boolean keyDown(int keycode) {
             if (keycode == Input.Keys.P) {
-                game.setScreen(new PauseScreen(game, (Screen) GameLevelThreeScreen.this , (Class<? extends Screen>) this.getClass()));
+                game.setScreen(new PauseScreen(game, (Screen) GameLevelThreeScreen.this , 3));
                 paused = PauseScreen.pause;
                 return true;
             }
@@ -429,15 +429,15 @@ public class GameLevelThreeScreen implements Screen {
             }
             else {
                 if (score < 300) {
-                    game.setScreen(new LevelFailScreen(game));
+                    game.setScreen(new LevelFailScreen(game,3));
                     saveGameProgress();
                 } else if (pigs.stream().allMatch(Pig::isDead)) {
                     score = score + 1500;
-                    game.setScreen(new WinScreen(game , nextLevel , score , 2000));
+                    game.setScreen(new WinScreen(game , nextLevel , score , 2000,3));
                     isCompleted = true;
                     saveGameProgress();
                 } else {
-                    game.setScreen(new WinScreen(game , nextLevel , score , 2000));
+                    game.setScreen(new WinScreen(game , nextLevel , score , 2000,3));
                     isCompleted = true;
                     saveGameProgress();
                 }
