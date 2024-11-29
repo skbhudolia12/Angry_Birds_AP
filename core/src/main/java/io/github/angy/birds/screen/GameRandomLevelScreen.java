@@ -472,7 +472,7 @@ public class GameRandomLevelScreen implements Screen {
         Gdx.gl.glClearColor(0.5f , 0.7f , 1f , 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        world.step(1 / 60f , 6 , 2);
+        world.step(1 / 120f , 6 , 2);
         camera.update();
         batch.setProjectionMatrix(camera.combined);
         for (Body body : bodiestoDestroy) {
