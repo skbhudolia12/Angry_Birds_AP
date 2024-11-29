@@ -36,7 +36,6 @@
 
         private World world;
         private Body groundBody;
-        private Box2DDebugRenderer debugRenderer;
 
         private AngryBird curBird;
         private Texture slingshotTexture;
@@ -71,7 +70,6 @@
 
             // Box2D setup
             world = new World(new Vector2(0, -9.8f), true); // Gravity
-            debugRenderer = new Box2DDebugRenderer();
 
             // Load textures
             slingshotTexture = new Texture("ui/slingshot.png");
@@ -467,13 +465,11 @@
         if (isDragging) {
             drawTrajectory();
         }
-        debugRenderer.render(world , camera.combined);
     }
 
         @Override
         public void dispose() {
             world.dispose();
-            debugRenderer.dispose();
             slingshotTexture.dispose();
             backgroundTexture.dispose();
             curBird.dispose();
